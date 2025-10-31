@@ -1,0 +1,492 @@
+body{
+    font-family: 'Times New Roman', Times, serif;
+    background-image: url('manos unidas.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center; 
+    padding: 0;
+    border: none;
+    margin: 0;
+    min-height: 100vh; 
+}
+
+.pagina-completa {
+    min-height: calc(100vh - 80px); 
+    padding: 0; 
+}
+
+.titulos-principales {
+    padding: 40px 40px 0 40px; 
+}
+
+.columnas-contenido {
+    display: grid;
+    grid-template-columns: minmax(300px, 1fr) 1fr minmax(300px, 1fr); 
+    gap: 20px; 
+    padding: 20px 40px 0 40px; 
+    align-items: flex-start; 
+}
+
+/* 1. COLUMNA IZQUIERDA (Bloques de colores) */
+.bloques-derecha {
+    display: flex;
+    flex-direction: column; 
+    gap: 10px; 
+    grid-column: 1 / 2; 
+    max-width: 500px; 
+}
+
+/* 2. COLUMNA DERECHA (Bloques celestes) */
+.contenedor-principal {
+    grid-column: 3 / 4; 
+    color: rgba(77, 119, 233, 0.575);
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+    max-height: 1730px;
+    display: flex;
+}
+
+/* --- ESTILO UNIFICADO PARA BLOQUES CELESTES --- */
+.contenido-texto,
+.contenido-texto-extra {
+    background-color: rgba(40, 166, 216, 0.384); 
+    padding: 20px; 
+    border-radius: 15px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); 
+    margin: 0; 
+    position: relative; 
+    box-sizing: border-box; 
+}
+
+#bloque-noticias-celeste,
+#bloque-derecha-superior-celeste,
+#bloque-derecha-inferior-celeste {
+     min-height: 4000px; 
+}
+
+
+/* ----------------- BLOQUES (Colores) ----------------- */
+
+#bloquepequeño1 {    
+    background-color: rgba(32, 138, 6, 0.548); 
+    color: rgb(255, 255, 255); 
+    padding: 20px;
+    border-radius: 15px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    flex-shrink: 0; 
+    display: flex;
+    flex-direction: column;
+    height: auto; 
+    box-sizing: border-box;
+}
+
+#bloquepequeño2  {
+    background-color: rgba(255, 6, 6, 0.548); 
+    color: rgb(255, 255, 255); 
+    padding: 20px;
+    border-radius: 15px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    flex-shrink: 0; 
+    display: flex;
+    flex-direction: column;
+    height: auto; 
+    box-sizing: border-box;
+}
+
+.bloque-intermedio-texto {
+    background-color: rgba(145, 145, 145, 0.7); 
+    color: rgb(19, 3, 3);
+    text-align: center;
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    height: 40px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 14px; 
+    box-sizing: border-box; 
+}
+.bloque-intermedio-texto p {
+    color: white;
+    margin: 0;
+    padding: 0;
+    font: sans-serif; 
+}
+
+.bloque-grande {
+    background-color: rgba(255, 125, 3, 0.507); 
+    color: rgb(255, 255, 255); 
+    padding: 20px;
+    border-radius: 15px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; 
+    min-height: 485px; 
+    box-sizing: border-box;
+}
+
+/* ----------------- FILAS Y RECUADROS ----------------- */
+
+.fila-recuadros {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end; 
+    gap: 15px; 
+    margin-bottom: 5px; 
+}
+
+.texto-fila-completa {
+    font-size: 13px; 
+    color: #ffffff;        
+    text-align: right; 
+    width: 100%;
+    margin-bottom: 15px; 
+}
+
+.recuadro-visual {
+    width: 80px;          
+    height: 80px;          
+    background-color: #f0f0f0; 
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    flex-shrink: 0; 
+}
+
+.recuadro-imagen-pequeno {
+    width: 80px;          
+    height: 80px;          
+    background-color: #f0f0f0; 
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    flex-shrink: 0; 
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+/* 3. BLOQUE INFERIOR ANCHO */
+.bloque-inferior-completo {
+    background-color: rgba(255, 125, 3, 0.507); 
+    color: rgb(255, 255, 255); 
+    border-radius: 15px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    padding: 20px 40px; 
+    margin: 10px 40px 40px 40px; 
+    box-sizing: border-box; 
+    min-height: 300px; 
+    display: flex;
+    flex-direction: column; 
+    justify-content: space-between; 
+    align-items: flex-end; 
+}
+.bloque-inferior-completo .fila-recuadros {
+    margin-bottom: 0; 
+    width: auto; 
+}
+.bloque-inferior-completo p {
+    color: white;
+    text-align: right;
+    width: 100%;
+    margin-top: 15px; 
+    padding: 0;
+    font: sans-serif;
+}
+
+
+/* ----------------- ESTILOS DE TEXTO ----------------- */
+
+.titulos-principales h1, 
+.titulos-principales h2 {
+    color: rgb(0, 0, 0); 
+    text-align: left; 
+    padding: 0 0 10px 0; 
+    margin-bottom: 20px;
+}
+.titulos-principales h1 {
+    font-size: 40px;
+}
+
+.contenido-texto h3, .contenido-texto p, .contenido-texto li,
+.contenido-texto-extra h3, .contenido-texto-extra p {
+    color: rgb(0, 0, 0); 
+    font: sans-serif;
+    padding: 0;
+    margin-bottom: 10px;
+}
+.contenedor-principal .contenido-texto-extra h3,
+.contenedor-principal .contenido-texto-extra p {
+    padding-right: 95px; 
+}
+.bloques-derecha .contenido-texto-extra h3,
+.bloques-derecha .contenido-texto-extra p {
+    padding-right: 0;
+}
+
+
+a{
+    color: rgb(255, 255, 255); 
+    text-decoration: none;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 8px; 
+    background-color: rgba(10, 4, 49, 0.85); 
+    transition: background-color .3s ease-in-out;
+    margin: 10px 0; 
+    display: block; 
+}
+
+a:hover {
+    background-color: rgba(10, 4, 49, 1);
+}
+
+p{
+    color: rgb(220, 220, 220); 
+    padding: 10px 0 20px 10px; 
+    margin: 0;
+    line-height: 1.5; 
+}
+
+/* --- IDs de Recuadros (Imágenes) --- */
+#recuadroizquierdo1 {
+    background-image: url('minecraft logo.png');
+    background-size: cover;
+}
+#recuadromedio1 {
+    background-image: url('valorant logo.png');
+    background-size: cover;
+}
+#recuadroderecho1 {
+    background-image: url('truco logo.png');
+    background-size: cover;
+}
+#recuadroizquierdo2 {
+    background-image: url('correcaminata\ recuadro\ izquierdo.png');
+    background-size: cover;
+}
+#recuadromedio2 {
+    background-image: url('correcaminata\ recuadro\ medio.png');
+    background-size: cover;
+}
+#recuadroderecho2 {
+    background-image: url('correcaminata\ recuadro\ derecho.png');
+    background-size: cover;
+}
+#recuadroizquierdo3 {
+    background-image: url('podcast\ recuadro\ izquierdo.png');
+    background-size: cover;
+}
+#recuadromedio3 {
+    background-image: url('podcast\ recuadro\ medio.png');
+    background-size: cover;
+}
+#recuadroderecho3 {
+    background-image: url('podcast\ recuadro\ derecho.png');
+    background-size: cover;
+}
+#recuadroizquierdo4 {
+    background-image: url('útiles\ izquierda.png');
+    background-size: cover;
+}
+#recuadromedio4 {
+    background-image: url('útiles\ medio.png');
+    background-size: cover;
+}
+#recuadroderecho4 {
+    background-image: url('útiles\ derecha.png');
+    background-size: cover;
+}
+#recuadroizquierdo5 {
+    background-image: url('pared\ creativa\ izquierda.png');
+    background-size: cover;
+}
+#recuadromedio5 {
+    background-image: url('pared\ creativa\ medio.png');
+    background-size: cover;
+}
+#recuadroderecho5 {
+    background-image: url('pared\ creativa\ derecha.png');
+    background-size: cover;
+}
+
+#recuadroizquierdo6 {
+    background-image: url('E.S.E.N.C.I.A\ izquierda.png');
+    background-size: cover;
+}
+#recuadromedio6 {
+    background-image: url('E.S.E.N.CI.A\ medio.png');
+    background-size: cover;
+}
+#recuadroderecho6 {
+    background-image: url('E.S.E.N.C.I.A\ derecha.png');
+    background-size: cover;
+}
+/* IDs de Texto (Noticias) */
+#noticias {
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 30px;
+    color: rgb(7, 0, 0);
+    padding: 10px;
+    font: sans-serif; 
+}
+#votaciones{
+    font-size: 25px;
+    color: rgb(0, 0, 0);
+    padding:10px;
+    font: sans-serif;
+}
+#Listarosa{
+    font-size: 20px;
+    color: rgb(226, 90, 90);
+    padding:5px;
+    font: sans-serif;
+}
+#Listaverde{
+    font-size: 20px;
+    color: rgb(65, 226, 25);
+    padding:5px;
+    font: sans-serif;
+}
+#Listamanosunidas{
+    font-size: 20px;
+    color: rgb(0, 0, 0);
+    padding:5px;
+    font: sans-serif;
+}
+#fecha_de_las_votaciones{
+    font-size: 18px;
+    color: rgb(0, 0, 0);
+    padding:10px;
+    font: sans-serif;
+}
+#mensaje_final{
+    font-size: 22px;
+    color: rgb(0, 0, 0);
+    padding:10px;
+    font: sans-serif;
+}
+.contenido-texto-extra{
+    min-height: 600px;
+}
+#manosunidasintegrantes{
+    background-image: URL('manos unidas integrantes.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+#concursoslink{
+    font-size: 20px;
+    background-color:rgba(0, 0, 0, 0);
+    text-decoration: none;
+    color: transparent;
+}
+#correcaminataslink{
+    font-size: 20px;
+    background-color:rgba(0, 0, 0, 0);
+    text-decoration: none;
+    color: transparent;
+}
+#podcastlink{
+    font-size: 20px;
+    background-color:rgba(0, 0, 0, 0);
+    text-decoration: none;
+    color: transparent;
+}
+#proyectomaterialeslink{
+    font-size: 20px;
+    background-color:rgba(0, 0, 0, 0);
+    text-decoration: none;
+    color: transparent;
+}
+
+/* --- SECCIÓN PROBLEMÁTICA (Corregida) --- */
+.contenedordecontenedoresderecho{
+    display: flex;
+    background-color:rgba(250, 245, 245, 0);
+    max-width: 356px; 
+    max-height: 700px;
+    margin: 0px;
+    padding: 0px;
+    gap: 10px; 
+}
+.recuadroderecuadros1{
+    display: flex;
+    flex-direction: column; 
+    background: rgba(0, 0, 0, 0);
+    height: 370px; 
+    width: 170px;  
+    overflow-y: auto;   
+    overflow-x: hidden; 
+    align-items: flex-start; 
+}
+.recuadro-derecho-derecho{
+    min-height: 370px;
+    min-width: 170px; 
+    background: rgba(40, 166, 216, 0.384);
+    border-radius: 20px;
+    margin: 0; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+.recuadro-derecho-izquierdo1,
+.recuadro-derecho-izquierdo2,
+.recuadro-derecho-izquierdo3 {
+    height: 158px;  
+    width: 158px;   
+    background: rgba(40, 166, 216, 0.384);
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0; 
+    margin: 0 0 10px 0; 
+}
+
+/* ------------------------------------------- */
+/* --- AÑADIDO: ESTILOS PARA TELÉFONOS --- */
+/* ------------------------------------------- */
+@media (max-width: 850px) {
+
+    .columnas-contenido {
+        /* Cambiamos el grid de 3 columnas a 1 sola */
+        grid-template-columns: 1fr; 
+        padding: 20px; /* Un padding más simple */
+    }
+    
+    .bloques-derecha {
+        grid-column: 1 / 2;
+        max-width: 100%; /* Permitimos que ocupe todo el ancho */
+    }
+    
+    .contenedor-principal {
+        grid-column: 1 / 2; /* Hacemos que ocupe la única columna */
+        grid-row: 2; /* Hacemos que aparezca DESPUÉS de la otra columna */
+        max-width: 100%;
+        max-height: none; /* Quitamos límite de altura */
+    }
+
+    .contenedordecontenedoresderecho {
+        max-width: 100%;
+        min-width: 0;
+        /* Hacemos que las dos cajitas (scroll y alta) 
+           se pongan una sobre otra en lugar de al lado */
+        flex-direction: column;
+        max-height: none;
+    }
+
+    .recuadroderecuadros1,
+    .recuadro-derecho-derecho {
+        width: 100%; /* Ocupan todo el ancho de la columna */
+        min-width: 0;
+        max-width: 100%;
+    }
+    
+    .titulos-principales h1 {
+        font-size: 32px; /* Achicamos un poco el título */
+    }
+}

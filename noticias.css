@@ -1,0 +1,21 @@
+body{
+    background-image: url('manos\ unidas.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.content-card{
+    max-width: 95%;
+    background-color: rgba(71, 71, 245, 0.459);
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    flex-shrink: 0;
+}
+.recuadro-de-imagenes{
+    background-image: url('La banda de segundo.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 400px;
+    height: 400px;
+    border-radius: 15px;
+}

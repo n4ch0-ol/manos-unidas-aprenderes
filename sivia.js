@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Esta URL es la "dirección" de tu Cocina. 
     // La conseguirás de Render en el siguiente paso.
     // -----------------------------------------------------------------
-    const SIVIA_API_URL = "https://sivia-backend.onrender.comm/chat"; 
+    const SIVIA_API_URL = "https://sivia-backend.onrender.com/chat"; 
     // -----------------------------------------------------------------
 
     chatForm.addEventListener('submit', async (e) => {
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Error:', error);
-            updateTypingMessage("Lo siento, no pude conectarme con la cocina. Intenta de nuevo.");
+            updateTypingMessage("Lo siento, no pude conectarme con el servidor. Intenta de nuevo.");
         } finally {
             sendButton.disabled = false; 
         }
@@ -65,4 +65,5 @@ document.addEventListener('DOMContentLoaded', () => {
             addMessageToChat(text, 'sivia-message');
         }
     }
+
 });

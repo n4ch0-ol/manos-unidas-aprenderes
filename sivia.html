@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.I.V.I.A</title>
+    <link rel="stylesheet" href="página principal.css"> 
+    <link rel="stylesheet" href="sivia.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="status-dot"></div>
+            <h2>S.I.V.I.A</h2>
+            <p>Sistema de Innovación Virtual</p>
+        </div>
+        <div class="chat-window" id="chat-window">
+            <div class="message sivia-message">
+                <p>¡Hola! Soy SIVIA. ¿En qué puedo ayudarte hoy?</p>
+            </div>
+        </div>
+        <form class="chat-input-form" id="chat-form">
+            <input type="text" id="user-input" placeholder="Escribe tu pregunta..." autocomplete="off">
+            <button type="submit" id="send-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </form>
+    </div>
+    <script src="sivia.js"></script>
+</body>
+</html>

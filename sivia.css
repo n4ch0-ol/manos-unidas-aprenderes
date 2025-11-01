@@ -1,0 +1,82 @@
+/* Esto hace que el chat se centre en la página */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+.chat-container {
+    width: 90%;
+    max-width: 600px;
+    height: 80vh;
+    max-height: 700px;
+    background-color: #2E2E3A;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeIn 0.8s ease-out;
+}
+.chat-header {
+    background-color: #25252e;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    border-bottom: 1px solid #444;
+}
+.chat-header h2 { margin: 0; color: white; font-family: sans-serif; }
+.chat-header p { margin: 0; padding: 0; color: #999; font-size: 14px; font-family: sans-serif; }
+.status-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #1DB954;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    animation: pulse 2s infinite;
+}
+.chat-window {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.message {
+    padding: 10px 15px;
+    border-radius: 20px;
+    max-width: 80%;
+    line-height: 1.5;
+    font-family: sans-serif;
+}
+.sivia-message { background-color: #444654; color: #ececec; align-self: flex-start; }
+.user-message { background-color: #1a8cff; color: white; align-self: flex-end; }
+.message p { margin: 0; padding: 0; color: white; }
+.chat-input-form { display: flex; padding: 15px; border-top: 1px solid #444; }
+#user-input {
+    flex-grow: 1;
+    border: none;
+    background-color: #444654;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+#user-input:focus { outline: none; box-shadow: 0 0 0 2px #1a8cff; }
+#send-button {
+    background-color: #1a8cff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+#send-button svg { fill: white; }
+#send-button:hover { background-color: #0073e6; }
+#send-button:disabled { background-color: #555; cursor: not-allowed; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(29, 185, 84, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(29, 185, 84, 0); } 100% { box-shadow: 0 0 0 0 rgba(29, 185, 84, 0); } }
+@media (max-width: 600px) { .chat-container { width: 100%; height: 100vh; max-height: 100vh; border-radius: 0; } }

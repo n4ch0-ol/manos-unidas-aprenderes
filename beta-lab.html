@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beta Lab - Manos Unidas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background-image: url('images/manos_unidas_oscuro.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .beta-header {
+            text-align: center;
+            padding: 3rem 0;
+        }
+
+        .beta-badge {
+            background: linear-gradient(135deg, #ffaa00, #ff4400);
+            color: white;
+            padding: 0.5rem 2rem;
+            border-radius: 25px;
+            display: inline-block;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .experimento {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .experimento h3 {
+            color: #00f0ff;
+            margin-bottom: 1rem;
+        }
+
+        .experimento p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .votar-btns {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-votar {
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-util {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+
+        .btn-no-util {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+
+        .btn-votar:hover {
+            transform: scale(1.05);
+        }
+
+        .stats {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">MANOS UNIDAS</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="beta-header">
+            <span class="beta-badge">BETA</span>
+            <h1 style="color: white;">Laboratorio de Experimentos</h1>
+            <p style="color: rgba(255,255,255,0.7);">Prueba nuevas funcionalidades y ayúdanos a decidir qué se queda</p>
+        </div>
+
+        <div class="experimentos">
+            <div class="experimento">
+                <h3>📅 Calendario de Eventos</h3>
+                <p>Un calendario interactivo que muestra todos los eventos importantes del colegio: torneos, votaciones, conciertos y más.</p>
+                <div class="votar-btns">
+                    <button class="btn-votar btn-util" onclick="votar('calendario', 1)">👍 Útil</button>
+                    <button class="btn-votar btn-no-util" onclick="votar('calendario', -1)">👎 No útil</button>
+                </div>
+                <div class="stats" id="stats-calendario">Votos: 0</div>
+            </div>
+
+            <div class="experimento">
+                <h3>⭐ Sistema de Puntos</h3>
+                <p>Gana puntos participando en actividades escolares, votando, y colaborando. Desbloquea logros y beneficios exclusivos.</p>
+                <div class="votar-btns">
+                    <button class="btn-votar btn-util" onclick="votar('puntos', 1)">👍 Útil</button>
+                    <button class="btn-votar btn-no-util" onclick="votar('puntos', -1)">👎 No útil</button>
+                </div>
+                <div class="stats" id="stats-puntos">Votos: 0</div>
+            </div>
+
+            <div class="experimento">
+                <h3>🛒 Marketplace Escolar</h3>
+                <p>Visualiza materiales disponibles para alquiler o venta entre estudiantes. Sistema seguro con reputación de vendedores.</p>
+                <div class="votar-btns">
+                    <button class="btn-votar btn-util" onclick="votar('marketplace', 1)">👍 Útil</button>
+                    <button class="btn-votar btn-no-util" onclick="votar('marketplace', -1)">👎 No útil</button>
+                </div>
+                <div class="stats" id="stats-marketplace">Votos: 0</div>
+            </div>
+
+            <div class="experimento">
+                <h3>💬 Chat por Curso</h3>
+                <p>Chat privado para cada curso. Comparte tareas, organiza eventos y mantente conectado con tus compañeros.</p>
+                <div class="votar-btns">
+                    <button class="btn-votar btn-util" onclick="votar('chat', 1)">👍 Útil</button>
+                    <button class="btn-votar btn-no-util" onclick="votar('chat', -1)">👎 No útil</button>
+                </div>
+                <div class="stats" id="stats-chat">Votos: 0</div>
+            </div>
+
+            <div class="experimento">
+                <h3>📚 Biblioteca Digital</h3>
+                <p>Accede y comparte apuntes, resúmenes y libros digitales. Todo organizado por materia y curso.</p>
+                <div class="votar-btns">
+                    <button class="btn-votar btn-util" onclick="votar('biblioteca', 1)">👍 Útil</button>
+                    <button class="btn-votar btn-no-util" onclick="votar('biblioteca', -1)">👎 No útil</button>
+                </div>
+                <div class="stats" id="stats-biblioteca">Votos: 0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cargar votos del localStorage
+        const votos = JSON.parse(localStorage.getItem('votos-beta-lab') || '{}');
+
+        function actualizarStats() {
+            Object.keys(votos).forEach(exp => {
+                const el = document.getElementById(`stats-${exp}`);
+                if (el) {
+                    const { util = 0, noUtil = 0 } = votos[exp];
+                    el.textContent = `👍 ${util} | 👎 ${noUtil}`;
+                }
+            });
+        }
+
+        function votar(experimento, voto) {
+            if (!votos[experimento]) {
+                votos[experimento] = { util: 0, noUtil: 0 };
+            }
+            
+            if (voto > 0) {
+                votos[experimento].util++;
+            } else {
+                votos[experimento].noUtil++;
+            }
+            
+            localStorage.setItem('votos-beta-lab', JSON.stringify(votos));
+            actualizarStats();
+            
+            alert('¡Voto registrado! Gracias por tu feedback.');
+        }
+
+        actualizarStats();
+    </script>
+    
+    <script src="js/sivia-flotante.js"></script>
+</body>
+</html>

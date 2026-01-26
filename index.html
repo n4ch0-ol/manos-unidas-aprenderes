@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manos Unidas - Centro de Estudiantes</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Glassmorphism específico para index */
+        body {
+            background-image: url('images/manos_unidas_oscuro.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Círculos de personas flotantes */
+        .personas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .persona {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,107,107,0.3), rgba(255,182,185,0.3));
+            backdrop-filter: blur(10px);
+            animation: float 20s infinite ease-in-out;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .persona:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .persona:nth-child(2) { top: 20%; right: 15%; animation-delay: 2s; background: linear-gradient(135deg, rgba(72,219,251,0.3), rgba(118,184,234,0.3)); }
+        .persona:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 4s; background: linear-gradient(135deg, rgba(255,195,113,0.3), rgba(255,166,0,0.3)); }
+        .persona:nth-child(4) { top: 50%; right: 10%; animation-delay: 6s; background: linear-gradient(135deg, rgba(156,136,255,0.3), rgba(99,88,238,0.3)); }
+        .persona:nth-child(5) { bottom: 30%; right: 25%; animation-delay: 8s; background: linear-gradient(135deg, rgba(72,187,120,0.3), rgba(56,178,172,0.3)); }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) scale(1);
+            }
+            25% {
+                transform: translateY(-30px) translateX(20px) scale(1.1);
+            }
+            50% {
+                transform: translateY(-15px) translateX(-20px) scale(0.9);
+            }
+            75% {
+                transform: translateY(-40px) translateX(10px) scale(1.05);
+            }
+        }
+
+        /* Manos conectadas en el fondo */
+        .manos-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 2px, transparent 2px),
+                radial-gradient(circle at 40% 80%, rgba(255,255,255,0.1) 2px, transparent 2px);
+            background-size: 100px 100px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Hero con glassmorphism */
+        .hero-glass {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 30px;
+            padding: 4rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-glass h1 {
+            font-size: 3.5rem;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            margin-bottom: 1rem;
+        }
+
+        .hero-glass p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.3rem;
+        }
+
+        /* Cards con glassmorphism */
+        .propuesta-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px) saturate(180%);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .propuesta-glass::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+        }
+
+        .propuesta-glass:hover::before {
+            left: 100%;
+        }
+
+        .propuesta-glass:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .propuesta-glass h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .propuesta-glass p {
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 1.5rem;
+        }
+
+        .votaciones-glass {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 142, 83, 0.3));
+            backdrop-filter: blur(15px) saturate(180%);
+            border-radius: 25px;
+            padding: 3rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            margin-top: 3rem;
+        }
+
+        .votaciones-glass h2 {
+            color: white;
+        }
+
+        .votaciones-glass p, .votaciones-glass li {
+            color: rgba(255,255,255,0.95);
+        }
+
+        /* Botón flotante SIVIA */
+        .sivia-float-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-image: url('images/sivia recuadro derecho.png');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
+            z-index: 9999;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .sivia-float-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 240, 255, 0.7);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
+            }
+            50% {
+                box-shadow: 0 4px 30px rgba(255, 0, 255, 0.7);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo de personas -->
+    <div class="personas-bg">
+        <div class="persona"></div>
+        <div class="persona"></div>
+        <div class="persona"></div>
+        <div class="persona"></div>
+        <div class="persona"></div>
+    </div>
+    <div class="manos-pattern"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ff6b6b"/>
+                            <stop offset="33%" style="stop-color:#48dbfb"/>
+                            <stop offset="66%" style="stop-color:#ffc371"/>
+                            <stop offset="100%" style="stop-color:#9c88ff"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="50" cy="40" r="8" fill="url(#logoGrad)"/>
+                    <circle cx="35" cy="55" r="8" fill="url(#logoGrad)"/>
+                    <circle cx="65" cy="55" r="8" fill="url(#logoGrad)"/>
+                    <circle cx="30" cy="70" r="7" fill="url(#logoGrad)"/>
+                    <circle cx="50" cy="70" r="7" fill="url(#logoGrad)"/>
+                    <circle cx="70" cy="70" r="7" fill="url(#logoGrad)"/>
+                    <line x1="50" y1="40" x2="35" y2="55" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <line x1="50" y1="40" x2="65" y2="55" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <line x1="35" y1="55" x2="30" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <line x1="35" y1="55" x2="50" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <line x1="65" y1="55" x2="50" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <line x1="65" y1="55" x2="70" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
+                </svg>
+                <span class="logo-text">MANOS UNIDAS</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Inicio</a></li>
+                <li><a href="sivia.html" class="nav-link">SIVIA</a></li>
+                <li><a href="concursos.html" class="nav-link">Torneos</a></li>
+                <li><a href="beta-lab.html" class="nav-link">Beta Lab</a></li>
+                <li><a href="forms.html" class="nav-link">Forms</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Hero -->
+        <section class="hero-glass">
+            <h1 class="text-center">🤝 Manos Unidas</h1>
+            <p class="text-center">Centro de Estudiantes - Construyendo el futuro juntos</p>
+            <div style="text-align: center; margin: 2rem 0;">
+                <a href="#propuestas" class="btn btn-primary">Nuestras Propuestas</a>
+            </div>
+        </section>
+
+        <!-- Propuestas -->
+        <section id="propuestas">
+            <h2 class="text-center" style="color: white; margin-bottom: 2rem;">Nuestras Propuestas</h2>
+            <div class="propuestas-grid">
+                <div class="propuesta-glass">
+                    <h3><img src="images/football imagen.jpg" alt="Torneos" style="width:35px;height:35px;margin-right:10px;"> Torneos y Concursos</h3>
+                    <p>Truco, Valorant, Minecraft, Fútbol, Ajedrez y UNO. Diversión para todos.</p>
+                    <a href="concursos.html" class="btn btn-primary">Ver Torneos</a>
+                </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/correcaminata recuadro derecho.png" alt="Correcaminatas" style="width:35px;height:35px;margin-right:10px;"> Correcaminatas</h3>
+                    <p>Eventos deportivos en las sierras promoviendo vida saludable.</p>
+                    <a href="correcaminatas.html" class="btn btn-primary">Conocer Más</a>
+                </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/podcast recuadro derecho.png" alt="Podcast" style="width:35px;height:35px;margin-right:10px;"> Podcast</h3>
+                    <p>Programa semanal con entrevistas a alumnos y profesores.</p>
+                    <a href="podcast.html" class="btn btn-primary">Escuchar</a>
+                </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/útiles medio.png" alt="Materiales" style="width:35px;height:35px;margin-right:10px;"> Proyecto Materiales</h3>
+                    <p>Inversión colaborativa para compra de materiales escolares.</p>
+                    <a href="materiales.html" class="btn btn-primary">Ver Proyecto</a>
+                </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/pared creativa derecha.png" alt="Pared Creativa" style="width:35px;height:35px;margin-right:10px;"> Pared Creativa</h3>
+                    <p>Espacio para expresión artística de toda la comunidad.</p>
+                    <a href="pared-creativa.html" class="btn btn-primary">Conocer</a>
+                </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/E.S.E.N.C.I.A izquierda.png" alt="ESENCIA" style="width:35px;height:35px;margin-right:10px;"> E.S.E.N.C.I.A</h3>
+                    <p>Reforma del sistema educativo para mayor flexibilidad.</p>
+                    <a href="esencia.html" class="btn btn-primary">Leer Más</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mensaje 2026 -->
+        <section id="mensaje2026">
+            <div class="votaciones-glass">
+                <h2 class="text-center">🎉 Suerte este 2026</h2>
+                <p style="text-align: center; font-size: 1.3rem; margin-top: 2rem; color: white;">
+                    <strong>¡Juntos construimos el futuro de nuestra comunidad estudiantil!</strong>
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Botón flotante SIVIA -->
+    <button class="sivia-float-btn" onclick="window.location.href='sivia.html'"></button>
+
+    <footer class="footer">
+        <p style="color: white;">&copy; 2026 Manos Unidas - Centro de Estudiantes</p>
+        <p style="color: rgba(255,255,255,0.8);">Construyendo el futuro juntos</p>
+    </footer>
+    
+    <script src="js/sivia-flotante.js"></script>
+</body>
+</html>

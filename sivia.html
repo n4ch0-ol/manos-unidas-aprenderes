@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIVIA - Manos Unidas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background-image: url('images/manos_unidas_oscuro.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(255, 0, 255, 0.3));
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .chat-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+        }
+
+        .chat-header h1 {
+            margin: 0;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .chat-messages {
+            padding: 2rem;
+            min-height: 400px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .message-avatar.sivia {
+            background-image: url('images/sivia recuadro derecho.png');
+        }
+
+        .message-avatar.user {
+            background: linear-gradient(135deg, #ff00ff, #00f0ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .message-content {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 15px;
+            max-width: 70%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .message.user .message-content {
+            background: rgba(0, 240, 255, 0.2);
+        }
+
+        .message p {
+            margin: 0;
+            color: white;
+        }
+
+        .typing {
+            display: none;
+            gap: 0.3rem;
+            padding: 1rem;
+        }
+
+        .typing.active {
+            display: flex;
+            align-items: center;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 0.3rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .chat-input {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-input form {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .chat-input input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .chat-input button {
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #00f0ff, #ff00ff);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .chat-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .chat-header img {
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">MANOS UNIDAS</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link">Inicio</a></li>
+                <li><a href="sivia.html" class="nav-link">SIVIA</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <img src="images/sivia recuadro derecho.png" alt="SIVIA">
+                <h1>SIVIA</h1>
+            </div>
+
+            <div class="chat-messages" id="messages">
+                <div class="message">
+                    <div class="message-avatar sivia"></div>
+                    <div class="message-content">
+                        <p>¡Hola! Soy SIVIA, tu asistente de Manos Unidas. ¿En qué puedo ayudarte?</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing" id="typing">
+                <div class="message-avatar sivia"></div>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+
+            <div class="chat-input">
+                <form id="chatForm">
+                    <input type="text" id="userInput" placeholder="Escribe tu pregunta..." autocomplete="off">
+                    <button type="submit">Enviar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SIVIA_API = "https://sivia-backend.onrender.com/chat";
+        
+        const form = document.getElementById('chatForm');
+        const input = document.getElementById('userInput');
+        const messages = document.getElementById('messages');
+        const typing = document.getElementById('typing');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = input.value.trim();
+            if (!question) return;
+
+            // Mensaje del usuario
+            addMessage(question, true);
+            input.value = '';
+
+            // Mostrar typing
+            typing.classList.add('active');
+
+            try {
+                const response = await fetch(SIVIA_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+                typing.classList.remove('active');
+                addMessage(data.answer || 'Lo siento, tuve un problema.', false);
+            } catch (error) {
+                typing.classList.remove('active');
+                addMessage('Error de conexión. Intenta de nuevo.', false);
+            }
+        });
+
+        function addMessage(text, isUser) {
+            const msg = document.createElement('div');
+            msg.className = `message ${isUser ? 'user' : ''}`;
+            
+            if (isUser) {
+                msg.innerHTML = `
+                    <div class="message-avatar user">U</div>
+                    <div class="message-content">
+                        <p>${text}</p>
+                    </div>
+                `;
+            } else {
+                msg.innerHTML = `
+                    <div class="message-avatar sivia"></div>
+                    <div class="message-content">
+                        <p>${text}</p>
+                    </div>
+                `;
+            }
+            
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+        }
+    </script>
+    
+    <script src="js/sivia-flotante.js"></script>
+</body>
+</html>

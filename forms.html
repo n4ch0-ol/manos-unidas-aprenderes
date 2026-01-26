@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formularios - Manos Unidas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background-image: url('images/manos_unidas_oscuro.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        .forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .form-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .form-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .form-card h3 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .form-card p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-content input,
+        .modal-content textarea {
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: inherit;
+        }
+
+        .modal-content input::placeholder,
+        .modal-content textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-content textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .success-modal {
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">MANOS UNIDAS</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center" style="color: white; margin: 2rem 0;">📝 Formularios</h1>
+        <p class="text-center" style="color: rgba(255,255,255,0.8); margin-bottom: 3rem;">Tu voz importa. Envía tus propuestas, sugerencias y feedback</p>
+
+        <div class="forms-grid">
+            <div class="form-card">
+                <div class="form-icon">💡</div>
+                <h3>Propuesta de Proyecto</h3>
+                <p>¿Tienes una idea innovadora? Compártela con nosotros</p>
+                <button class="btn btn-primary" onclick="abrirForm('propuesta')">Completar Formulario</button>
+            </div>
+
+            <div class="form-card">
+                <div class="form-icon">✏️</div>
+                <h3>Sugerencias</h3>
+                <p>Ayúdanos a mejorar con tus comentarios y sugerencias</p>
+                <button class="btn btn-primary" onclick="abrirForm('sugerencia')">Completar Formulario</button>
+            </div>
+
+            <div class="form-card">
+                <div class="form-icon">⚠️</div>
+                <h3>Reportar Problema</h3>
+                <p>¿Encontraste algo que no funciona? Repórtalo aquí</p>
+                <button class="btn btn-primary" onclick="abrirForm('problema')">Completar Formulario</button>
+            </div>
+
+            <div class="form-card">
+                <div class="form-icon">🎮</div>
+                <h3>Inscripción a Torneos</h3>
+                <p>Regístrate para participar en los torneos y concursos</p>
+                <button class="btn btn-primary" onclick="abrirForm('torneo')">Completar Formulario</button>
+            </div>
+
+            <div class="form-card">
+                <div class="form-icon"><img src="images/sivia recuadro derecho.png" style="width:48px;height:48px;border-radius:50%;"></div>
+                <h3>Feedback SIVIA</h3>
+                <p>Ayuda a mejorar nuestra IA con tu experiencia</p>
+                <button class="btn btn-primary" onclick="abrirForm('sivia')">Completar Formulario</button>
+            </div>
+
+            <div class="form-card">
+                <div class="form-icon">📧</div>
+                <h3>Contacto CE</h3>
+                <p>Envía un mensaje directo al Centro de Estudiantes</p>
+                <button class="btn btn-primary" onclick="abrirForm('contacto')">Completar Formulario</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div class="modal" id="formModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarForm()">×</button>
+            <h2 id="formTitle">Formulario</h2>
+            <form id="dynamicForm" onsubmit="enviarForm(event)">
+                <input type="text" placeholder="Tu nombre" required>
+                <input type="email" placeholder="Tu email" required>
+                <textarea placeholder="Tu mensaje" required></textarea>
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Éxito -->
+    <div class="modal" id="successModal">
+        <div class="modal-content success-modal">
+            <div class="success-icon">✓</div>
+            <h2>¡Formulario Enviado!</h2>
+            <p style="color: rgba(255,255,255,0.8);">Gracias por tu participación. Revisaremos tu mensaje pronto.</p>
+            <button class="btn btn-primary" onclick="cerrarSuccess()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        const titulos = {
+            propuesta: 'Propuesta de Proyecto',
+            sugerencia: 'Sugerencias',
+            problema: 'Reportar Problema',
+            torneo: 'Inscripción a Torneos',
+            sivia: 'Feedback SIVIA',
+            contacto: 'Contacto CE'
+        };
+
+        function abrirForm(tipo) {
+            document.getElementById('formTitle').textContent = titulos[tipo];
+            document.getElementById('formModal').classList.add('active');
+        }
+
+        function cerrarForm() {
+            document.getElementById('formModal').classList.remove('active');
+        }
+
+        function cerrarSuccess() {
+            document.getElementById('successModal').classList.remove('active');
+        }
+
+        function enviarForm(e) {
+            e.preventDefault();
+            cerrarForm();
+            document.getElementById('successModal').classList.add('active');
+            document.getElementById('dynamicForm').reset();
+        }
+    </script>
+    
+    <script src="js/sivia-flotante.js"></script>
+</body>
+</html>

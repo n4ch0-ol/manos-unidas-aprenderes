@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast - Manos Unidas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .podcast-layout {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .podcast-player {
+            background: #1c1c1c;
+            border-radius: 15px;
+            padding: 1.5rem;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .podcast-player img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .player-info {
+            color: white;
+        }
+
+        .player-info h4 {
+            margin: 0.5rem 0;
+            color: #1DB954;
+        }
+
+        .player-info p {
+            color: #b3b3b3;
+            font-size: 0.9rem;
+        }
+
+        .play-button {
+            background: #1DB954;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .podcast-layout {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="with-background" style="background-image: url('images/manos_unidas_oscuro.png'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat;">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-text">MANOS UNIDAS</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="podcast-layout">
+            <div class="content-card" style="flex: 1;">
+                <h1>Podcast Manos Unidas</h1>
+                
+                <h2>¿Qué es 'el podcast'?</h2>
+                <p>El podcast es un programa realizado por manos unidas los viernes, en el que se invita a alumnos y profesores.</p>
+                
+                <h2>¿De qué se habla en el podcast?</h2>
+                <p>En el podcast los invitados hablan de temas variados, algunos de estos pueden ser proyectos que están haciendo los alumnos invitados, de ser el caso y estar un profesor, pueden hablar de cosas que ayuden a los alumnos, y si no está sucediendo, o si no quieren hablar de eso, se puede hablar de la vida escolar</p>
+                
+                <h2>¿Cuál es el objetivo del podcast?</h2>
+                <p>El objetivo del podcast es tener una instancia en la que haya un ida y vuelta activo entre los alumnos invitados y los profesores si es que deciden ir, puede ser un espacio para anunciar novedades y, aunque no parezca, puede servir para aprender.</p>
+            </div>
+
+            <div class="podcast-player">
+                <img src="images/podcast-microfono.jpg" alt="Podcast Manos Unidas">
+                <div class="player-info">
+                    <h4>Podcast Manos Unidas</h4>
+                    <p>Escucha nuestros episodios</p>
+                    <button class="play-button">▶ Reproducir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 Manos Unidas</p>
+    </footer>
+</body>
+</html>

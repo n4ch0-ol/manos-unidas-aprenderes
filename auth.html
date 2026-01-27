@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Manos Unidas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            background-image: url('images/manos_unidas_oscuro.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .auth-container {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-container h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: white;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: rgba(0, 240, 255, 0.8);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00f0ff, #ff00ff);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .toggle-form a {
+            color: #00f0ff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .toggle-form a:hover {
+            color: #ff00ff;
+        }
+
+        .info-box {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h1>🔐 Manos Unidas</h1>
+
+        <div class="info-box">
+            ℹ️ Solo se permite acceso con correo del colegio (@colegioaprenderes.edu.ar)
+        </div>
+
+        <!-- FORMULARIO LOGIN -->
+        <div id="loginForm" class="form-section active">
+            <form id="loginFormSubmit">
+                <div class="form-group">
+                    <label>Correo del Colegio</label>
+                    <input type="email" id="loginEmail" placeholder="ejemplo@colegioaprenderes.edu.ar" required>
+                    <div class="error" id="loginEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    <div class="error" id="loginPasswordError"></div>
+                </div>
+
+                <button type="submit" class="btn-submit">Iniciar Sesión</button>
+
+                <div class="toggle-form">
+                    ¿No tienes cuenta? <a onclick="toggleForm()">Regístrate aquí</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- FORMULARIO REGISTRO -->
+        <div id="registerForm" class="form-section">
+            <form id="registerFormSubmit">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="registerName" placeholder="Tu nombre" required>
+                    <div class="error" id="registerNameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Correo del Colegio</label>
+                    <input type="email" id="registerEmail" placeholder="ejemplo@colegioaprenderes.edu.ar" required>
+                    <div class="error" id="registerEmailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" required>
+                    <div class="error" id="registerPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirmar Contraseña</label>
+                    <input type="password" id="registerPasswordConfirm" placeholder="Repite tu contraseña" required>
+                    <div class="error" id="registerPasswordConfirmError"></div>
+                </div>
+
+                <button type="submit" class="btn-submit">Registrarse</button>
+
+                <div class="toggle-form">
+                    ¿Ya tienes cuenta? <a onclick="toggleForm()">Inicia sesión aquí</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        function toggleForm() {
+            document.getElementById('loginForm').classList.toggle('active');
+            document.getElementById('registerForm').classList.toggle('active');
+        }
+
+        document.getElementById('loginFormSubmit').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email.endsWith('@colegioaprenderes.edu.ar')) {
+                showError('loginEmailError', 'Solo correos @colegioaprenderes.edu.ar');
+                return;
+            }
+
+            const result = await auth.login(email, password);
+
+            if (result.success) {
+                alert('¡Bienvenido! ' + result.data.username);
+                window.location.href = 'index.html';
+            } else {
+                showError('loginPasswordError', result.error);
+            }
+        });
+
+        document.getElementById('registerFormSubmit').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+            if (username.length < 3) {
+                showError('registerNameError', 'Mínimo 3 caracteres');
+                return;
+            }
+
+            if (!email.endsWith('@colegioaprenderes.edu.ar')) {
+                showError('registerEmailError', 'Solo correos @colegioaprenderes.edu.ar');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('registerPasswordError', 'Mínimo 6 caracteres');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showError('registerPasswordConfirmError', 'Las contraseñas no coinciden');
+                return;
+            }
+
+            const result = await auth.register(username, email, password);
+
+            if (result.success) {
+                alert('¡Registrado exitosamente! Bienvenido ' + result.data.username);
+                window.location.href = 'index.html';
+            } else {
+                showError('registerEmailError', result.error);
+            }
+        });
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.classList.add('show');
+            setTimeout(() => {
+                element.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

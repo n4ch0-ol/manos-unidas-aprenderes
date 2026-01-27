@@ -155,34 +155,67 @@
     </div>
 
     <script>
-        // Cargar votos del localStorage
-        const votos = JSON.parse(localStorage.getItem('votos-beta-lab') || '{}');
+        // Reemplazar las funciones votar y actualizarStats por llamadas al backend cuando sea posible
+        async function votar(experimento, voto) {
+            // Si hay auth global, usar token
+            const token = localStorage.getItem('auth_token');
+            if (!token) {
+                alert('Debes iniciar sesión con tu correo del colegio para votar.');
+                return;
+            }
 
-        function actualizarStats() {
-            Object.keys(votos).forEach(exp => {
+            try {
+                const res = await fetch('https://sivia-backend.onrender.com/api/vote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ experiment: experimento, vote: voto })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || 'Error al votar');
+                }
+                // actualizar UI con conteo devuelto
+                const el = document.getElementById(`stats-${experimento}`);
+                if (el && data.votes) {
+                    el.textContent = `👍 ${data.votes.util} | 👎 ${data.votes.noUtil}`;
+                }
+                alert('¡Voto registrado! Gracias por tu feedback.');
+            } catch (err) {
+                console.error(err);
+                alert('No se pudo registrar el voto. Intenta de nuevo.');
+            }
+        }
+
+        // Al inicializar, intentar cargar votos desde backend (no obligatorio)
+        async function actualizarStats() {
+            // Intent simple: leer votes.json desde backend (si expones endpoint). 
+            // Si no existe, usar localStorage fallback (mantener compatibilidad).
+            try {
+                const res = await fetch('https://sivia-backend.onrender.com/api/votes');
+                if (res.ok) {
+                    const data = await res.json();
+                    Object.keys(data).forEach(exp => {
+                        const el = document.getElementById(`stats-${exp}`);
+                        if (el) el.textContent = `👍 ${data[exp].util} | 👎 ${data[exp].noUtil}`;
+                    });
+                    return;
+                }
+            } catch (e) {
+                // fallback a localStorage (comportamiento previo)
+            }
+
+            // fallback a localStorage (comportamiento previo)
+            const votosLocal = JSON.parse(localStorage.getItem('votos-beta-lab') || '{}');
+            Object.keys(votosLocal).forEach(exp => {
                 const el = document.getElementById(`stats-${exp}`);
                 if (el) {
-                    const { util = 0, noUtil = 0 } = votos[exp];
+                    const { util = 0, noUtil = 0 } = votosLocal[exp];
                     el.textContent = `👍 ${util} | 👎 ${noUtil}`;
                 }
             });
-        }
-
-        function votar(experimento, voto) {
-            if (!votos[experimento]) {
-                votos[experimento] = { util: 0, noUtil: 0 };
-            }
-            
-            if (voto > 0) {
-                votos[experimento].util++;
-            } else {
-                votos[experimento].noUtil++;
-            }
-            
-            localStorage.setItem('votos-beta-lab', JSON.stringify(votos));
-            actualizarStats();
-            
-            alert('¡Voto registrado! Gracias por tu feedback.');
         }
 
         actualizarStats();

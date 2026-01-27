@@ -157,7 +157,6 @@
     <script>
         // Reemplazar las funciones votar y actualizarStats por llamadas al backend cuando sea posible
         async function votar(experimento, voto) {
-            // Si hay auth global, usar token
             const token = localStorage.getItem('auth_token');
             if (!token) {
                 alert('Debes iniciar sesión con tu correo del colegio para votar.');
@@ -189,10 +188,7 @@
             }
         }
 
-        // Al inicializar, intentar cargar votos desde backend (no obligatorio)
         async function actualizarStats() {
-            // Intent simple: leer votes.json desde backend (si expones endpoint). 
-            // Si no existe, usar localStorage fallback (mantener compatibilidad).
             try {
                 const res = await fetch('https://sivia-backend.onrender.com/api/votes');
                 if (res.ok) {

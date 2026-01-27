@@ -3,8 +3,53 @@
 // ============================================
 
 const SIVIA_API_URL = "https://sivia-backend.onrender.com/chat";
+let knowledgeBase = null;
+
+// Cargar base de datos JSON
+async function loadKnowledgeBase() {
+    try {
+        const response = await fetch('data/sivia-knowledge-base.json');
+        knowledgeBase = await response.json();
+        console.log('📚 Base de conocimiento cargada:', knowledgeBase);
+    } catch (error) {
+        console.warn('No se pudo cargar la base de conocimiento local:', error);
+    }
+}
+
+// Buscar respuesta en la base de datos local
+function searchLocalKnowledge(question) {
+    if (!knowledgeBase) return null;
+    
+    const lowerQuestion = question.toLowerCase();
+    
+    // Buscar en FAQs
+    for (let faq of knowledgeBase.preguntas_frecuentes) {
+        if (lowerQuestion.includes(faq.pregunta.toLowerCase().split(' ').slice(0, 3).join(' '))) {
+            return faq.respuesta;
+        }
+    }
+    
+    // Buscar en proyectos
+    for (let proyecto of knowledgeBase.proyectos) {
+        if (lowerQuestion.includes(proyecto.nombre.toLowerCase())) {
+            return proyecto.descripcion;
+        }
+    }
+    
+    // Buscar en formularios
+    for (let form of knowledgeBase.formularios) {
+        if (lowerQuestion.includes(form.nombre.toLowerCase())) {
+            return `Puedes usar el formulario "${form.nombre}" (${form.emoji}) para ${form.descripcion}.`;
+        }
+    }
+    
+    return null;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Cargar base de conocimiento
+    loadKnowledgeBase();
+    
     // CSS para la ventana flotante
     const style = document.createElement('style');
     style.textContent = `
@@ -340,20 +385,33 @@ document.addEventListener('DOMContentLoaded', () => {
         // Mostrar typing
         typing.classList.add('active');
 
-        try {
-            const response = await fetch(SIVIA_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question })
-            });
+        // Primero intentar buscar en la base local
+        const localResponse = searchLocalKnowledge(question);
+        
+        if (localResponse) {
+            // Si encontró respuesta local, usarla
+            typing.classList.remove('active');
+            addMessage(localResponse, false);
+        } else {
+            // Si no, consultar la API
+            try {
+                const response = await fetch(SIVIA_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        question,
+                        knowledgeBase: knowledgeBase // Enviar la base de datos también
+                    })
+                });
 
-            const data = await response.json();
-            typing.classList.remove('active');
-            addMessage(data.answer || 'Lo siento, tuve un problema.', false);
-        } catch (error) {
-            typing.classList.remove('active');
-            addMessage('Error de conexión. Verifica que el backend esté activo.', false);
-            console.error('Error:', error);
+                const data = await response.json();
+                typing.classList.remove('active');
+                addMessage(data.answer || 'Lo siento, tuve un problema.', false);
+            } catch (error) {
+                typing.classList.remove('active');
+                addMessage('Error de conexión. Verifica que el backend esté activo.', false);
+                console.error('Error:', error);
+            }
         }
     });
 

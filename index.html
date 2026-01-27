@@ -261,6 +261,17 @@
                 <li><a href="concursos.html" class="nav-link">Torneos</a></li>
                 <li><a href="beta-lab.html" class="nav-link">Beta Lab</a></li>
                 <li><a href="forms.html" class="nav-link">Forms</a></li>
+                <li id="userMenu">
+                    <div id="loginButtons">
+                        <a href="auth.html" class="nav-link" style="color: #00f0ff;">Iniciar Sesión</a>
+                        <span style="color: rgba(255,255,255,0.5);"> | </span>
+                        <a href="auth.html" class="nav-link" style="color: #ff00ff;">Registrate</a>
+                    </div>
+                    <div id="userInfo" style="display: none; display: flex; align-items: center; gap: 1rem;">
+                        <span style="color: white;">👤 <strong id="userNameDisplay"></strong></span>
+                        <a href="#" class="nav-link" onclick="logout(); return false;" style="color: #ff6b6b;">Cerrar Sesión</a>
+                    </div>
+                </li>
             </ul>
         </div>
     </nav>
@@ -335,6 +346,37 @@
         <p style="color: white;">&copy; 2026 Manos Unidas - Centro de Estudiantes</p>
         <p style="color: rgba(255,255,255,0.8);">Construyendo el futuro juntos</p>
     </footer>
+    
+    <script src="js/auth.js"></script>
+    <script>
+        // Actualizar menú de usuario al cargar
+        function updateUserMenu() {
+            const loggedIn = auth.isLoggedIn();
+            const loginButtons = document.getElementById('loginButtons');
+            const userInfo = document.getElementById('userInfo');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            
+            if (loggedIn) {
+                loginButtons.style.display = 'none';
+                userInfo.style.display = 'flex';
+                userNameDisplay.textContent = auth.username || 'Usuario';
+            } else {
+                loginButtons.style.display = 'inline';
+                userInfo.style.display = 'none';
+            }
+        }
+
+        function logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                auth.logout();
+                updateUserMenu();
+                alert('Sesión cerrada');
+            }
+        }
+
+        // Actualizar al cargar la página
+        updateUserMenu();
+    </script>
     
     <script src="js/sivia-flotante.js"></script>
 </body>

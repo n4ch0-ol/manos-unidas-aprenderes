@@ -1,5 +1,5 @@
 // Sistema de autenticación del lado del cliente
-const AUTH_API = "https://tu-auth-backend.onrender.com"; // Cambiar por tu URL de Render
+const AUTH_API = "https://sivia-backend.onrender.com";
 
 class AuthSystem {
     constructor() {
@@ -7,16 +7,18 @@ class AuthSystem {
         this.username = localStorage.getItem('username');
     }
 
-    async register(username, email, password, curso) {
+    async register(username, email, password) {
+        // opcional: verificación rápida de dominio en frontend
+        if (!email.endsWith("@colegioaprenderes.edu.ar")) {
+            return { success: false, error: 'Solo direcciones @colegioaprenderes.edu.ar' };
+        }
         try {
             const response = await fetch(`${AUTH_API}/api/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password, curso })
+                body: JSON.stringify({ username, email, password })
             });
-            
             const data = await response.json();
-            
             if (response.ok) {
                 this.token = data.token;
                 this.username = data.username;
@@ -24,23 +26,21 @@ class AuthSystem {
                 localStorage.setItem('username', data.username);
                 return { success: true, data };
             } else {
-                return { success: false, error: data.error };
+                return { success: false, error: data.error || data.message };
             }
         } catch (error) {
             return { success: false, error: 'Error de conexión' };
         }
     }
 
-    async login(username, password) {
+    async login(email, password) {
         try {
             const response = await fetch(`${AUTH_API}/api/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ email, password })
             });
-            
             const data = await response.json();
-            
             if (response.ok) {
                 this.token = data.token;
                 this.username = data.username;
@@ -48,7 +48,7 @@ class AuthSystem {
                 localStorage.setItem('username', data.username);
                 return { success: true, data };
             } else {
-                return { success: false, error: data.error };
+                return { success: false, error: data.error || data.message };
             }
         } catch (error) {
             return { success: false, error: 'Error de conexión' };
@@ -63,7 +63,11 @@ class AuthSystem {
     }
 
     isLoggedIn() {
-        return this.token !== null;
+        return !!this.token;
+    }
+
+    getToken() {
+        return this.token;
     }
 
     async getProfile() {
@@ -87,19 +91,21 @@ class AuthSystem {
         if (!this.token) return { success: false, error: 'Debes iniciar sesión' };
         
         try {
-            const response = await fetch(`${AUTH_API}/api/experiments/vote`, {
+            const response = await fetch(`${AUTH_API}/api/vote`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${this.token}`
                 },
-                body: JSON.stringify({ experiment_name: experimentName, vote, comment })
+                body: JSON.stringify({ experiment: experimentName, vote })
             });
             
+            const data = await response.json();
+            
             if (response.ok) {
-                return { success: true };
+                return { success: true, data };
             }
-            return { success: false };
+            return { success: false, error: data.error || data.message };
         } catch (error) {
             return { success: false, error: 'Error de conexión' };
         }
@@ -107,7 +113,7 @@ class AuthSystem {
 
     async getExperimentStats(experimentName) {
         try {
-            const response = await fetch(`${AUTH_API}/api/experiments/stats/${experimentName}`);
+            const response = await fetch(`${AUTH_API}/api/votes/${encodeURIComponent(experimentName)}`);
             if (response.ok) {
                 return await response.json();
             }

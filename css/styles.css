@@ -370,3 +370,67 @@ ul {
         font-size: 1.3rem;
     }
 }
+
+/* --- PARTE NUEVA PARA EL MENÚ LATERAL --- */
+@media (max-width: 768px) {
+    .nav-container {
+        justify-content: flex-start !important;
+    }
+    
+    .mobile-menu-btn {
+        display: block !important;
+    }
+
+    .nav-links {
+        display: none !important;
+    }
+
+    .logo {
+        margin-right: auto;
+    }
+}
+
+/* Sidebar Styling */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background: rgba(10, 10, 15, 0.98);
+    backdrop-filter: blur(15px);
+    border-right: 1px solid var(--primary-glow);
+    z-index: 2000;
+    padding: 2rem;
+    transition: left 0.4s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.close-sidebar {
+    align-self: flex-end;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+}
+
+.sidebar-links {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.sidebar-links .nav-link {
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: var(--text-secondary);
+}

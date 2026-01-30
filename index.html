@@ -46,27 +46,15 @@
         .persona:nth-child(5) { bottom: 30%; right: 25%; animation-delay: 8s; background: linear-gradient(135deg, rgba(72,187,120,0.3), rgba(56,178,172,0.3)); }
 
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0) translateX(0) scale(1);
-            }
-            25% {
-                transform: translateY(-30px) translateX(20px) scale(1.1);
-            }
-            50% {
-                transform: translateY(-15px) translateX(-20px) scale(0.9);
-            }
-            75% {
-                transform: translateY(-40px) translateX(10px) scale(1.05);
-            }
+            0%, 100% { transform: translateY(0) translateX(0) scale(1); }
+            25% { transform: translateY(-30px) translateX(20px) scale(1.1); }
+            50% { transform: translateY(-15px) translateX(-20px) scale(0.9); }
+            75% { transform: translateY(-40px) translateX(10px) scale(1.05); }
         }
 
-        /* Manos conectadas en el fondo */
         .manos-pattern {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0.1;
             background-image: 
                 radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 2px, transparent 2px),
@@ -77,12 +65,8 @@
             pointer-events: none;
         }
 
-        .container {
-            position: relative;
-            z-index: 1;
-        }
+        .container { position: relative; z-index: 1; }
 
-        /* Hero con glassmorphism */
         .hero-glass {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(20px) saturate(180%);
@@ -95,29 +79,13 @@
         }
 
         @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .hero-glass h1 {
-            font-size: 3.5rem;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            margin-bottom: 1rem;
-        }
+        .hero-glass h1 { font-size: 3.5rem; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.2); margin-bottom: 1rem; }
+        .hero-glass p { color: rgba(255,255,255,0.9); font-size: 1.3rem; }
 
-        .hero-glass p {
-            color: rgba(255,255,255,0.9);
-            font-size: 1.3rem;
-        }
-
-        /* Cards con glassmorphism */
         .propuesta-glass {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px) saturate(180%);
@@ -129,39 +97,10 @@
             overflow: hidden;
         }
 
-        .propuesta-glass::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: rotate(45deg);
-            transition: all 0.6s ease;
-        }
-
-        .propuesta-glass:hover::before {
-            left: 100%;
-        }
-
         .propuesta-glass:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: translateY(-10px) scale(1.02);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        }
-
-        .propuesta-glass h3 {
-            color: white;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .propuesta-glass p {
-            color: rgba(255,255,255,0.85);
-            margin-bottom: 1.5rem;
         }
 
         .votaciones-glass {
@@ -170,91 +109,110 @@
             border-radius: 25px;
             padding: 3rem;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             margin-top: 3rem;
         }
 
-        .votaciones-glass h2 {
-            color: white;
-        }
-
-        .votaciones-glass p, .votaciones-glass li {
-            color: rgba(255,255,255,0.95);
-        }
-
-        /* Botón flotante SIVIA */
         .sivia-float-btn {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
+            bottom: 20px; right: 20px;
+            width: 60px; height: 60px;
             background-image: url('images/sivia recuadro derecho.png');
             background-size: cover;
-            background-position: center;
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
             z-index: 9999;
-            transition: all 0.3s ease;
             animation: pulse 2s infinite;
         }
 
-        .sivia-float-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(0, 240, 255, 0.7);
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5); }
+            50% { box-shadow: 0 4px 30px rgba(255, 0, 255, 0.7); }
         }
 
-        @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
-            }
-            50% {
-                box-shadow: 0 4px 30px rgba(255, 0, 255, 0.7);
-            }
+        /* Estilos Sidebar integrados en el head para index */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #00f0ff;
+            font-size: 2rem;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0; left: -280px;
+            width: 280px; height: 100vh;
+            background: rgba(10, 10, 15, 0.98);
+            backdrop-filter: blur(15px);
+            border-right: 1px solid #00f0ff;
+            z-index: 2000;
+            padding: 2rem;
+            transition: left 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.active { left: 0; }
+
+        .close-sidebar {
+            align-self: flex-end;
+            background: none; border: none;
+            color: white; font-size: 2.5rem;
+            cursor: pointer; margin-bottom: 2rem;
+        }
+
+        .sidebar-links { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn { display: block; }
+            .nav-links { display: none; }
         }
     </style>
 </head>
 <body>
-    <!-- Fondo de personas -->
     <div class="personas-bg">
-        <div class="persona"></div>
-        <div class="persona"></div>
-        <div class="persona"></div>
-        <div class="persona"></div>
-        <div class="persona"></div>
+        <div class="persona"></div><div class="persona"></div><div class="persona"></div><div class="persona"></div><div class="persona"></div>
     </div>
     <div class="manos-pattern"></div>
 
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-container">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+            
             <a href="index.html" class="logo">
                 <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#ff6b6b"/>
-                            <stop offset="33%" style="stop-color:#48dbfb"/>
-                            <stop offset="66%" style="stop-color:#ffc371"/>
-                            <stop offset="100%" style="stop-color:#9c88ff"/>
+                            <stop offset="0%" style="stop-color:#ff6b6b"/><stop offset="33%" style="stop-color:#48dbfb"/>
+                            <stop offset="66%" style="stop-color:#ffc371"/><stop offset="100%" style="stop-color:#9c88ff"/>
                         </linearGradient>
                     </defs>
-                    <circle cx="50" cy="40" r="8" fill="url(#logoGrad)"/>
-                    <circle cx="35" cy="55" r="8" fill="url(#logoGrad)"/>
-                    <circle cx="65" cy="55" r="8" fill="url(#logoGrad)"/>
-                    <circle cx="30" cy="70" r="7" fill="url(#logoGrad)"/>
-                    <circle cx="50" cy="70" r="7" fill="url(#logoGrad)"/>
-                    <circle cx="70" cy="70" r="7" fill="url(#logoGrad)"/>
-                    <line x1="50" y1="40" x2="35" y2="55" stroke="url(#logoGrad)" stroke-width="2"/>
-                    <line x1="50" y1="40" x2="65" y2="55" stroke="url(#logoGrad)" stroke-width="2"/>
-                    <line x1="35" y1="55" x2="30" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
-                    <line x1="35" y1="55" x2="50" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
-                    <line x1="65" y1="55" x2="50" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
-                    <line x1="65" y1="55" x2="70" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <circle cx="50" cy="40" r="8" fill="url(#logoGrad)"/><circle cx="35" cy="55" r="8" fill="url(#logoGrad)"/><circle cx="65" cy="55" r="8" fill="url(#logoGrad)"/>
+                    <circle cx="30" cy="70" r="7" fill="url(#logoGrad)"/><circle cx="50" cy="70" r="7" fill="url(#logoGrad)"/><circle cx="70" cy="70" r="7" fill="url(#logoGrad)"/>
+                    <line x1="50" y1="40" x2="35" y2="55" stroke="url(#logoGrad)" stroke-width="2"/><line x1="50" y1="40" x2="65" y2="55" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <line x1="35" y1="55" x2="30" y2="70" stroke="url(#logoGrad)" stroke-width="2"/><line x1="35" y1="55" x2="50" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
+                    <line x1="65" y1="55" x2="50" y2="70" stroke="url(#logoGrad)" stroke-width="2"/><line x1="65" y1="55" x2="70" y2="70" stroke="url(#logoGrad)" stroke-width="2"/>
                 </svg>
                 <span class="logo-text">MANOS UNIDAS</span>
             </a>
+
+            <div class="sidebar" id="sidebar">
+                <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+                <ul class="sidebar-links">
+                    <li><a href="index.html" class="nav-link">Inicio</a></li>
+                    <li><a href="sivia.html" class="nav-link">SIVIA</a></li>
+                    <li><a href="concursos.html" class="nav-link">Torneos</a></li>
+                    <li><a href="beta-lab.html" class="nav-link">Beta Lab</a></li>
+                    <li><a href="forms.html" class="nav-link">Forms</a></li>
+                    <hr style="border: 0.5px solid rgba(255,255,255,0.1);">
+                    <li><a href="auth.html" class="nav-link" style="color: #00f0ff;">Iniciar Sesión</a></li>
+                    <li><a href="auth.html" class="nav-link" style="color: #ff00ff;">Registrate</a></li>
+                </ul>
+            </div>
+
             <ul class="nav-links">
                 <li><a href="index.html" class="nav-link">Inicio</a></li>
                 <li><a href="sivia.html" class="nav-link">SIVIA</a></li>
@@ -267,7 +225,7 @@
                         <span style="color: rgba(255,255,255,0.5);"> | </span>
                         <a href="auth.html" class="nav-link" style="color: #ff00ff;">Registrate</a>
                     </div>
-                    <div id="userInfo" style="display: none; display: flex; align-items: center; gap: 1rem;">
+                    <div id="userInfo" style="display: none; align-items: center; gap: 1rem;">
                         <span style="color: white;">👤 <strong id="userNameDisplay"></strong></span>
                         <a href="#" class="nav-link" onclick="logout(); return false;" style="color: #ff6b6b;">Cerrar Sesión</a>
                     </div>
@@ -277,7 +235,6 @@
     </nav>
 
     <div class="container">
-        <!-- Hero -->
         <section class="hero-glass">
             <h1 class="text-center">🤝 Manos Unidas</h1>
             <p class="text-center">Centro de Estudiantes - Construyendo el futuro juntos</p>
@@ -286,40 +243,14 @@
             </div>
         </section>
 
-        <!-- Propuestas -->
         <section id="propuestas">
             <h2 class="text-center" style="color: white; margin-bottom: 2rem;">Nuestras Propuestas</h2>
             <div class="propuestas-grid">
                 <div class="propuesta-glass">
-                    <h3><img src="images/football imagen.jpg" alt="Torneos" style="width:35px;height:35px;margin-right:10px;"> Torneos y Concursos</h3>
-                    <p>Truco, Valorant, Minecraft, Fútbol, Ajedrez y UNO. Diversión para todos.</p>
+                    <h3><img src="images/football imagen.jpg" alt="Torneos" style="width:35px;height:35px;border-radius:5px;margin-right:10px;"> Torneos</h3>
+                    <p>Truco, Valorant, Minecraft, Fútbol, Ajedrez y UNO.</p>
                     <a href="concursos.html" class="btn btn-primary">Ver Torneos</a>
                 </div>
-
-                <div class="propuesta-glass">
-                    <h3><img src="images/correcaminata recuadro derecho.png" alt="Correcaminatas" style="width:35px;height:35px;margin-right:10px;"> Correcaminatas</h3>
-                    <p>Eventos deportivos en las sierras promoviendo vida saludable.</p>
-                    <a href="correcaminatas.html" class="btn btn-primary">Conocer Más</a>
-                </div>
-
-                <div class="propuesta-glass">
-                    <h3><img src="images/podcast recuadro derecho.png" alt="Podcast" style="width:35px;height:35px;margin-right:10px;"> Podcast</h3>
-                    <p>Programa semanal con entrevistas a alumnos y profesores.</p>
-                    <a href="podcast.html" class="btn btn-primary">Escuchar</a>
-                </div>
-
-                <div class="propuesta-glass">
-                    <h3><img src="images/útiles medio.png" alt="Materiales" style="width:35px;height:35px;margin-right:10px;"> Proyecto Materiales</h3>
-                    <p>Inversión colaborativa para compra de materiales escolares.</p>
-                    <a href="materiales.html" class="btn btn-primary">Ver Proyecto</a>
-                </div>
-
-                <div class="propuesta-glass">
-                    <h3><img src="images/pared creativa derecha.png" alt="Pared Creativa" style="width:35px;height:35px;margin-right:10px;"> Pared Creativa</h3>
-                    <p>Espacio para expresión artística de toda la comunidad.</p>
-                    <a href="pared-creativa.html" class="btn btn-primary">Conocer</a>
-                </div>
-
                 <div class="propuesta-glass">
                     <h3><img src="images/E.S.E.N.C.I.A izquierda.png" alt="ESENCIA" style="width:35px;height:35px;margin-right:10px;"> E.S.E.N.C.I.A</h3>
                     <p>Reforma del sistema educativo para mayor flexibilidad.</p>
@@ -328,7 +259,6 @@
             </div>
         </section>
 
-        <!-- Mensaje 2026 -->
         <section id="mensaje2026">
             <div class="votaciones-glass">
                 <h2 class="text-center">🎉 Suerte este 2026</h2>
@@ -339,19 +269,20 @@
         </section>
     </div>
 
-    <!-- Botón flotante SIVIA -->
     <button class="sivia-float-btn" onclick="window.location.href='sivia.html'"></button>
 
     <footer class="footer">
         <p style="color: white;">&copy; 2026 Manos Unidas - Centro de Estudiantes</p>
-        <p style="color: rgba(255,255,255,0.8);">Construyendo el futuro juntos</p>
     </footer>
-    
+
     <script src="js/auth.js"></script>
     <script>
-        // Actualizar menú de usuario al cargar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
         function updateUserMenu() {
-            const loggedIn = auth.isLoggedIn();
+            const loggedIn = typeof auth !== 'undefined' && auth.isLoggedIn();
             const loginButtons = document.getElementById('loginButtons');
             const userInfo = document.getElementById('userInfo');
             const userNameDisplay = document.getElementById('userNameDisplay');
@@ -367,17 +298,13 @@
         }
 
         function logout() {
-            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+            if (confirm('¿Estás seguro?')) {
                 auth.logout();
                 updateUserMenu();
-                alert('Sesión cerrada');
             }
         }
-
-        // Actualizar al cargar la página
         updateUserMenu();
     </script>
-    
     <script src="js/sivia-flotante.js"></script>
 </body>
 </html>

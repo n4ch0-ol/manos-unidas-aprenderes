@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Voxel Architect v4.1 - Sync Update</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+        #input_video { position: absolute; width: 100vw; height: 100vh; object-fit: cover; transform: scaleX(-1); z-index: 1; }
+        #three_canvas { position: absolute; top: 0; left: 0; z-index: 5; pointer-events: none; }
+        #biometric_canvas { position: absolute; width: 100vw; height: 100vh; z-index: 10; transform: scaleX(-1); pointer-events: none; }
+        #ui { 
+            position: absolute; top: 20px; left: 20px; z-index: 100;
+            color: #00f0ff; font-weight: bold; font-size: 14px;
+            text-shadow: 0 0 10px #00f0ff; border-left: 3px solid #00f0ff; padding-left: 15px;
+            background: rgba(0,0,0,0.6); padding: 15px;
+        }
+        .stat-val { color: #fff; }
+    </style>
+</head>
+<body>
+    <div id="ui">
+        <div>BIO_SYNC: ARCHITECT_OS_v4.1</div>
+        <div>STATE: <span id="mode" class="stat-val">INITIALIZING</span></div>
+        <div>VOXELS: <span id="count" class="stat-val">0</span></div>
+        <div style="font-size: 10px; margin-top: 5px; color: #ff3333;">2 FISTS: HOLD TO RESET | 2 FINGERS ROTATE: TRACKPAD GESTURE</div>
+    </div>
+
+    <video id="input_video" autoplay playsinline></video>
+    <canvas id="three_canvas"></canvas>
+    <canvas id="biometric_canvas"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        const videoElement = document.getElementById('input_video');
+        const bioCanvas = document.getElementById('biometric_canvas');
+        const bioCtx = bioCanvas.getContext('2d');
+        const modeEl = document.getElementById('mode');
+        const countEl = document.getElementById('count');
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('three_canvas'), antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const voxelGroup = new THREE.Group();
+        scene.add(voxelGroup);
+        const currentSketch = new THREE.Group();
+        voxelGroup.add(currentSketch);
+
+        const gridSize = 1.2; 
+        const placedVoxels = new Map();
+        
+        const crosshair = new THREE.Mesh(
+            new THREE.BoxGeometry(gridSize, gridSize, gridSize),
+            new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.5 })
+        );
+        scene.add(crosshair);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const sun = new THREE.DirectionalLight(0x00f0ff, 1.0);
+        sun.position.set(5, 5, 5);
+        scene.add(sun);
+        camera.position.z = 20;
+
+        let smoothedLandmarks = { Left: [], Right: [] };
+
+        function drawHUDCircle(ctx, x, y, progress, color) {
+            ctx.beginPath();
+            ctx.arc(x, y, 35, -Math.PI/2, (-Math.PI/2) + (Math.PI * 2 * progress));
+            ctx.lineWidth = 5; ctx.strokeStyle = color; ctx.stroke();
+            ctx.setLineDash([3, 5]);
+            ctx.beginPath(); ctx.arc(x, y, 30, 0, Math.PI * 2); ctx.lineWidth = 1; ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawCyberHand(ctx, landmarks, label) {
+            if (!smoothedLandmarks[label] || smoothedLandmarks[label].length === 0) {
+                smoothedLandmarks[label] = landmarks.map(p => ({...p}));
+            } else {
+                landmarks.forEach((p, i) => {
+                    smoothedLandmarks[label][i].x += (p.x - smoothedLandmarks[label][i].x) * 0.45;
+                    smoothedLandmarks[label][i].y += (p.y - smoothedLandmarks[label][i].y) * 0.45;
+                    smoothedLandmarks[label][i].z += (p.z - smoothedLandmarks[label][i].z) * 0.1; 
+                });
+            }
+            const pts = smoothedLandmarks[label];
+            ctx.shadowBlur = 10; ctx.shadowColor = "#00f0ff";
+            ctx.beginPath(); ctx.strokeStyle = "rgba(0, 240, 255, 0.6)"; ctx.lineWidth = 2;
+            const CONNECTIONS = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[9,10],[10,11],[11,12],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17],[0,5]];
+            CONNECTIONS.forEach(([a, b]) => {
+                ctx.moveTo(pts[a].x * bioCanvas.width, pts[a].y * bioCanvas.height);
+                ctx.lineTo(pts[b].x * bioCanvas.width, pts[b].y * bioCanvas.height);
+            });
+            ctx.stroke();
+            pts.forEach((pt, i) => {
+                const x = pt.x * bioCanvas.width, y = pt.y * bioCanvas.height;
+                if ([4, 8, 12, 16, 20].includes(i)) {
+                    ctx.strokeStyle = "#00f0ff"; ctx.strokeRect(x - 6, y - 6, 12, 12);
+                } else { ctx.fillStyle = "#fff"; ctx.fillRect(x - 2, y - 2, 4, 4); }
+            });
+        }
+
+        let isGrabbingLeft = false, grabTimerLeft = 0;
+        let grabOffsetLeft = new THREE.Vector3();
+        let isGrabbingRight = false, grabTimerRight = 0;
+        let grabOffsetRight = new THREE.Vector3();
+        
+        let isBuildingLeft = false, buildTimerLeft = 0;
+        let isErasingLeft = false, eraseTimerLeft = 0;
+        let isBuildingRight = false, buildTimerRight = 0;
+        let isErasingRight = false, eraseTimerRight = 0;
+        let resetTimer = 0;
+
+        let startPinchPosLeft = null, activeAxisLeft = null;
+        let sketchKeysLeft = new Set();
+        let startPinchPosRight = null, activeAxisRight = null;
+        let sketchKeysRight = new Set();
+        
+        const GRAB_HOLD = 500;      
+        const INTENT_HOLD = 500;    
+        const RESET_HOLD = 1000;    
+
+        const pinchThreshold = 0.05;
+        
+        let prevRotateAngle = null;
+
+        function getDist(p1, p2) { return Math.sqrt(Math.pow(p1.x-p2.x,2)+Math.pow(p1.y-p2.y,2)+(p1.z&&p2.z?Math.pow(p1.z-p2.z,2):0)); }
+
+        function onResults(results) {
+            bioCtx.clearRect(0, 0, bioCanvas.width, bioCanvas.height);
+            crosshair.visible = false;
+            
+            if (!results.multiHandLandmarks) {
+                isGrabbingLeft = false; isBuildingLeft = false; isErasingLeft = false;
+                isGrabbingRight = false; isBuildingRight = false; isErasingRight = false;
+                grabTimerLeft = 0; buildTimerLeft = 0; eraseTimerLeft = 0;
+                grabTimerRight = 0; buildTimerRight = 0; eraseTimerRight = 0;
+                resetTimer = 0;
+                prevRotateAngle = null;
+                return;
+            }
+
+            let lHand = null, rHand = null;
+
+            results.multiHandedness.forEach((hand, idx) => {
+                const landmarks = results.multiHandLandmarks[idx];
+                drawCyberHand(bioCtx, landmarks, hand.label);
+                if(hand.label === 'Left') lHand = smoothedLandmarks['Left'];
+                if(hand.label === 'Right') rHand = smoothedLandmarks['Right'];
+            });
+
+            if (lHand && rHand) {
+                const lFist = lHand[8].y > lHand[6].y && lHand[12].y > lHand[10].y && lHand[16].y > lHand[14].y;
+                const rFist = rHand[8].y > rHand[6].y && rHand[12].y > rHand[10].y && rHand[16].y > rHand[14].y;
+
+                if (lFist && rFist) {
+                    if (resetTimer < RESET_HOLD) {
+                        resetTimer += 16;
+                        drawHUDCircle(bioCtx, bioCanvas.width / 2, bioCanvas.height / 2, resetTimer/RESET_HOLD, "#ff0055");
+                        modeEl.innerText = "SYSTEM: HOLD TO RESET...";
+                    } else {
+                        voxelGroup.position.set(0, 0, 0);
+                        voxelGroup.rotation.set(0, 0, 0);
+                        modeEl.innerText = "SYSTEM: HARD_RESET COMPLETE";
+                    }
+                    prevRotateAngle = null;
+                    return; 
+                } else {
+                    resetTimer = 0; 
+                }
+
+                const lTwoFingers = lHand[8].y < lHand[6].y && lHand[12].y < lHand[10].y && lHand[16].y > lHand[14].y && lHand[20].y > lHand[18].y;
+                const rTwoFingers = rHand[8].y < rHand[6].y && rHand[12].y < rHand[10].y && rHand[16].y > rHand[14].y && rHand[20].y > rHand[18].y;
+
+                if (lTwoFingers || rTwoFingers) {
+                    const hand = lTwoFingers ? lHand : rHand;
+                    const midX = (hand[8].x + hand[12].x) / 2;
+                    
+                    if (prevRotateAngle !== null) {
+                        const deltaX = midX - prevRotateAngle;
+                        voxelGroup.rotation.y += deltaX * 8;
+                        modeEl.innerText = "SYSTEM: TRACKPAD_ROTATE ACTIVE";
+                    }
+                    prevRotateAngle = midX;
+                    return; 
+                } else {
+                    prevRotateAngle = null;
+                }
+            } else {
+                resetTimer = 0;
+                prevRotateAngle = null;
+            }
+
+            let lPinching = false, rPinching = false;
+            
+            if (lHand) {
+                const isFist = lHand[8].y > lHand[6].y && lHand[12].y > lHand[10].y && lHand[16].y > lHand[14].y;
+                const isPalm = lHand[8].y < lHand[6].y && lHand[12].y < lHand[10].y;
+                lPinching = getDist(lHand[4], lHand[8]) < pinchThreshold;
+                const handWorldPos = new THREE.Vector3((0.5 - lHand[9].x) * 25, (0.5 - lHand[9].y) * 18, 0);
+
+                if (isFist) {
+                    if (grabTimerLeft < GRAB_HOLD) {
+                        grabTimerLeft += 16;
+                        drawHUDCircle(bioCtx, lHand[0].x * bioCanvas.width, lHand[0].y * bioCanvas.height, grabTimerLeft/GRAB_HOLD, "#ffbb00");
+                    } else {
+                        if (!isGrabbingLeft) { grabOffsetLeft.copy(voxelGroup.position).sub(handWorldPos); isGrabbingLeft = true; }
+                        voxelGroup.position.copy(handWorldPos).add(grabOffsetLeft);
+                        modeEl.innerText = "BIO_LINK: GRABBED (LEFT)";
+                    }
+                } else { isGrabbingLeft = false; grabTimerLeft = 0; if(isPalm) modeEl.innerText = "BIO_LINK: SCANNING"; }
+            }
+
+            if (rHand) {
+                const isFist = rHand[8].y > rHand[6].y && rHand[12].y > rHand[10].y && rHand[16].y > rHand[14].y;
+                const isPalm = rHand[8].y < rHand[6].y && rHand[12].y < rHand[10].y;
+                rPinching = getDist(rHand[4], rHand[8]) < pinchThreshold;
+                const handWorldPos = new THREE.Vector3((0.5 - rHand[9].x) * 25, (0.5 - rHand[9].y) * 18, 0);
+
+                if (isFist) {
+                    if (grabTimerRight < GRAB_HOLD) {
+                        grabTimerRight += 16;
+                        drawHUDCircle(bioCtx, rHand[0].x * bioCanvas.width, rHand[0].y * bioCanvas.height, grabTimerRight/GRAB_HOLD, "#ffbb00");
+                    } else {
+                        if (!isGrabbingRight) { grabOffsetRight.copy(voxelGroup.position).sub(handWorldPos); isGrabbingRight = true; }
+                        voxelGroup.position.copy(handWorldPos).add(grabOffsetRight);
+                        modeEl.innerText = "BIO_LINK: GRABBED (RIGHT)";
+                    }
+                } else { isGrabbingRight = false; grabTimerRight = 0; if(isPalm) modeEl.innerText = "BIO_LINK: SCANNING"; }
+            }
+
+            if (lHand) {
+                const thumbTip = lHand[4], indexTip = lHand[8], midTip = lHand[12];
+                const pinchingNow = getDist(thumbTip, indexTip) < pinchThreshold;
+                const pointingNow = indexTip.y < lHand[6].y && midTip.y > lHand[10].y;
+                const palmOpen = lHand[8].y < lHand[6].y && lHand[12].y < lHand[10].y && lHand[20].y < lHand[18].y;
+
+                const px = indexTip.x * bioCanvas.width, py = indexTip.y * bioCanvas.height;
+                const worldPos = new THREE.Vector3((0.5 - indexTip.x) * 25, (0.5 - indexTip.y) * 18, -indexTip.z * 25);
+                const localPos = voxelGroup.worldToLocal(worldPos.clone());
+                const gx = Math.round(localPos.x / gridSize) * gridSize, gy = Math.round(localPos.y / gridSize) * gridSize, gz = Math.round(localPos.z / gridSize) * gridSize;
+
+                if (rPinching && pointingNow && !palmOpen) {
+                    buildTimerLeft = 0;
+                    if (eraseTimerLeft < INTENT_HOLD) {
+                        eraseTimerLeft += 16;
+                        drawHUDCircle(bioCtx, px, py, eraseTimerLeft/INTENT_HOLD, "#ff3333");
+                        modeEl.innerText = "INTENT: ERASER_LOCKING (LEFT)...";
+                    } else {
+                        isErasingLeft = true;
+                        const key = `${gx.toFixed(1)},${gy.toFixed(1)},${gz.toFixed(1)}`;
+                        if (placedVoxels.has(key)) {
+                            voxelGroup.remove(placedVoxels.get(key));
+                            placedVoxels.delete(key);
+                            countEl.innerText = placedVoxels.size;
+                        }
+                        modeEl.innerText = "INTENT: ERASER_ACTIVE (LEFT)";
+                    }
+                } 
+                else if (pinchingNow && !isGrabbingLeft && !isGrabbingRight && !palmOpen) {
+                    eraseTimerLeft = 0;
+                    if (buildTimerLeft < INTENT_HOLD) {
+                        buildTimerLeft += 16;
+                        drawHUDCircle(bioCtx, px, py, buildTimerLeft/INTENT_HOLD, "#00ffcc");
+                        modeEl.innerText = "INTENT: BUILD_SYNCING (LEFT)...";
+                    } else {
+                        if (!isBuildingLeft) { startPinchPosLeft = { x: gx, y: gy, z: gz }; sketchKeysLeft.clear(); isBuildingLeft = true; activeAxisLeft = null; }
+                        else {
+                            const dx = Math.abs(gx - startPinchPosLeft.x), dy = Math.abs(gy - startPinchPosLeft.y), dz = Math.abs(gz - startPinchPosLeft.z);
+                            if (!activeAxisLeft && (dx > 0.4 || dy > 0.4 || dz > 0.4)) {
+                                if (dx >= dy && dx >= dz) activeAxisLeft = 'x';
+                                else if (dy >= dx && dy >= dz) activeAxisLeft = 'y';
+                                else activeAxisLeft = 'z';
+                            }
+                            let tx = startPinchPosLeft.x, ty = startPinchPosLeft.y, tz = startPinchPosLeft.z;
+                            if (activeAxisLeft === 'x') tx = gx; else if (activeAxisLeft === 'y') ty = gy; else if (activeAxisLeft === 'z') tz = gz;
+                            addSketchVoxel(tx, ty, tz, 'left');
+                        }
+                        modeEl.innerText = "INTENT: BUILDING (LEFT)";
+                    }
+                } 
+                else {
+                    if (palmOpen) {
+                        if (isBuildingLeft) commitVoxels('left');
+                        isBuildingLeft = false; isErasingLeft = false;
+                        buildTimerLeft = 0; eraseTimerLeft = 0;
+                        if (!isBuildingRight && !isErasingRight) modeEl.innerText = "BIO_LINK: NAVIGATING";
+                    }
+                }
+
+                if (isBuildingLeft || buildTimerLeft > 0 || isErasingLeft || eraseTimerLeft > 0) {
+                    crosshair.visible = true;
+                    crosshair.position.copy(voxelGroup.localToWorld(new THREE.Vector3(gx, gy, gz)));
+                    crosshair.material.color.set((isErasingLeft || eraseTimerLeft > 0) ? 0xff3333 : 0x00f0ff);
+                }
+            }
+
+            if (rHand) {
+                const thumbTip = rHand[4], indexTip = rHand[8], midTip = rHand[12];
+                const pinchingNow = getDist(thumbTip, indexTip) < pinchThreshold;
+                const pointingNow = indexTip.y < rHand[6].y && midTip.y > rHand[10].y;
+                const palmOpen = rHand[8].y < rHand[6].y && rHand[12].y < rHand[10].y && rHand[20].y < rHand[18].y;
+
+                const px = indexTip.x * bioCanvas.width, py = indexTip.y * bioCanvas.height;
+                const worldPos = new THREE.Vector3((0.5 - indexTip.x) * 25, (0.5 - indexTip.y) * 18, -indexTip.z * 25);
+                const localPos = voxelGroup.worldToLocal(worldPos.clone());
+                const gx = Math.round(localPos.x / gridSize) * gridSize, gy = Math.round(localPos.y / gridSize) * gridSize, gz = Math.round(localPos.z / gridSize) * gridSize;
+
+                if (lPinching && pointingNow && !palmOpen) {
+                    buildTimerRight = 0;
+                    if (eraseTimerRight < INTENT_HOLD) {
+                        eraseTimerRight += 16;
+                        drawHUDCircle(bioCtx, px, py, eraseTimerRight/INTENT_HOLD, "#ff3333");
+                        modeEl.innerText = "INTENT: ERASER_LOCKING (RIGHT)...";
+                    } else {
+                        isErasingRight = true;
+                        const key = `${gx.toFixed(1)},${gy.toFixed(1)},${gz.toFixed(1)}`;
+                        if (placedVoxels.has(key)) {
+                            voxelGroup.remove(placedVoxels.get(key));
+                            placedVoxels.delete(key);
+                            countEl.innerText = placedVoxels.size;
+                        }
+                        modeEl.innerText = "INTENT: ERASER_ACTIVE (RIGHT)";
+                    }
+                } 
+                else if (pinchingNow && !isGrabbingLeft && !isGrabbingRight && !palmOpen) {
+                    eraseTimerRight = 0;
+                    if (buildTimerRight < INTENT_HOLD) {
+                        buildTimerRight += 16;
+                        drawHUDCircle(bioCtx, px, py, buildTimerRight/INTENT_HOLD, "#00ffcc");
+                        modeEl.innerText = "INTENT: BUILD_SYNCING (RIGHT)...";
+                    } else {
+                        if (!isBuildingRight) { startPinchPosRight = { x: gx, y: gy, z: gz }; sketchKeysRight.clear(); isBuildingRight = true; activeAxisRight = null; }
+                        else {
+                            const dx = Math.abs(gx - startPinchPosRight.x), dy = Math.abs(gy - startPinchPosRight.y), dz = Math.abs(gz - startPinchPosRight.z);
+                            if (!activeAxisRight && (dx > 0.4 || dy > 0.4 || dz > 0.4)) {
+                                if (dx >= dy && dx >= dz) activeAxisRight = 'x';
+                                else if (dy >= dx && dy >= dz) activeAxisRight = 'y';
+                                else activeAxisRight = 'z';
+                            }
+                            let tx = startPinchPosRight.x, ty = startPinchPosRight.y, tz = startPinchPosRight.z;
+                            if (activeAxisRight === 'x') tx = gx; else if (activeAxisRight === 'y') ty = gy; else if (activeAxisRight === 'z') tz = gz;
+                            addSketchVoxel(tx, ty, tz, 'right');
+                        }
+                        modeEl.innerText = "INTENT: BUILDING (RIGHT)";
+                    }
+                } 
+                else {
+                    if (palmOpen) {
+                        if (isBuildingRight) commitVoxels('right');
+                        isBuildingRight = false; isErasingRight = false;
+                        buildTimerRight = 0; eraseTimerRight = 0;
+                        if (!isBuildingLeft && !isErasingLeft) modeEl.innerText = "BIO_LINK: NAVIGATING";
+                    }
+                }
+
+                if (isBuildingRight || buildTimerRight > 0 || isErasingRight || eraseTimerRight > 0) {
+                    crosshair.visible = true;
+                    crosshair.position.copy(voxelGroup.localToWorld(new THREE.Vector3(gx, gy, gz)));
+                    crosshair.material.color.set((isErasingRight || eraseTimerRight > 0) ? 0xff3333 : 0x00f0ff);
+                }
+            }
+        }
+
+        function addSketchVoxel(x, y, z, hand) {
+            const key = `${x.toFixed(1)},${y.toFixed(1)},${z.toFixed(1)}`;
+            const sketchKeys = hand === 'left' ? sketchKeysLeft : sketchKeysRight;
+            if (sketchKeys.has(key) || placedVoxels.has(key)) return;
+            const mesh = new THREE.Mesh(new THREE.BoxGeometry(gridSize*0.98, gridSize*0.98, gridSize*0.98), new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true }));
+            mesh.position.set(x, y, z);
+            currentSketch.add(mesh);
+            sketchKeys.add(key);
+        }
+
+        function commitVoxels(hand) {
+            while(currentSketch.children.length > 0) {
+                const f = currentSketch.children[0];
+                const key = `${f.position.x.toFixed(1)},${f.position.y.toFixed(1)},${f.position.z.toFixed(1)}`;
+                const cube = createFinalCube(f.position.x, f.position.y, f.position.z);
+                voxelGroup.add(cube);
+                placedVoxels.set(key, cube);
+                currentSketch.remove(f);
+            }
+            if (hand === 'left') sketchKeysLeft.clear();
+            else sketchKeysRight.clear();
+            countEl.innerText = placedVoxels.size;
+        }
+
+        function createFinalCube(x, y, z) {
+            const g = new THREE.BoxGeometry(gridSize*0.95, gridSize*0.95, gridSize*0.95);
+            const m = new THREE.MeshPhongMaterial({ color: 0x001122, emissive: 0x00f0ff, emissiveIntensity: 0.4, transparent: true, opacity: 0.8 });
+            const mesh = new THREE.Mesh(g, m);
+            mesh.position.set(x, y, z);
+            mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), new THREE.LineBasicMaterial({ color: 0x00f0ff })));
+            return mesh;
+        }
+
+        const hands = new Hands({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+        hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.8, minTrackingConfidence: 0.8 });
+        hands.onResults(onResults);
+        new Camera(videoElement, { onFrame: async () => { bioCanvas.width = videoElement.videoWidth; bioCanvas.height = videoElement.videoHeight; await hands.send({image: videoElement}); }, width: 1280, height: 720 }).start();
+        function animate() { requestAnimationFrame(animate); renderer.render(scene, camera); }
+        animate();
+    </script>
+</body>
+</html>

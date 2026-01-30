@@ -130,7 +130,7 @@
             50% { box-shadow: 0 4px 30px rgba(255, 0, 255, 0.7); }
         }
 
-        /* Estilos Sidebar integrados en el head para index */
+        /* Estilos Sidebar */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -164,7 +164,7 @@
             cursor: pointer; margin-bottom: 2rem;
         }
 
-        .sidebar-links { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; }
+        .sidebar-links { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; padding: 0; }
         
         @media (max-width: 768px) {
             .mobile-menu-btn { display: block; }
@@ -207,7 +207,7 @@
                     <li><a href="concursos.html" class="nav-link">Torneos</a></li>
                     <li><a href="beta-lab.html" class="nav-link">Beta Lab</a></li>
                     <li><a href="forms.html" class="nav-link">Forms</a></li>
-                    <hr style="border: 0.5px solid rgba(255,255,255,0.1);">
+                    <hr style="border: 0.5px solid rgba(255,255,255,0.1); width: 100%;">
                     <li><a href="auth.html" class="nav-link" style="color: #00f0ff;">Iniciar Sesión</a></li>
                     <li><a href="auth.html" class="nav-link" style="color: #ff00ff;">Registrate</a></li>
                 </ul>
@@ -247,10 +247,35 @@
             <h2 class="text-center" style="color: white; margin-bottom: 2rem;">Nuestras Propuestas</h2>
             <div class="propuestas-grid">
                 <div class="propuesta-glass">
-                    <h3><img src="images/football imagen.jpg" alt="Torneos" style="width:35px;height:35px;border-radius:5px;margin-right:10px;"> Torneos</h3>
-                    <p>Truco, Valorant, Minecraft, Fútbol, Ajedrez y UNO.</p>
+                    <h3><img src="images/football imagen.jpg" alt="Torneos" style="width:35px;height:35px;margin-right:10px; border-radius: 5px;"> Torneos y Concursos</h3>
+                    <p>Truco, Valorant, Minecraft, Fútbol, Ajedrez y UNO. Diversión para todos.</p>
                     <a href="concursos.html" class="btn btn-primary">Ver Torneos</a>
                 </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/correcaminata recuadro derecho.png" alt="Correcaminatas" style="width:35px;height:35px;margin-right:10px;"> Correcaminatas</h3>
+                    <p>Eventos deportivos en las sierras promoviendo vida saludable.</p>
+                    <a href="correcaminatas.html" class="btn btn-primary">Conocer Más</a>
+                </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/podcast recuadro derecho.png" alt="Podcast" style="width:35px;height:35px;margin-right:10px;"> Podcast</h3>
+                    <p>Programa semanal con entrevistas a alumnos y profesores.</p>
+                    <a href="podcast.html" class="btn btn-primary">Escuchar</a>
+                </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/útiles medio.png" alt="Materiales" style="width:35px;height:35px;margin-right:10px;"> Proyecto Materiales</h3>
+                    <p>Inversión colaborativa para compra de materiales escolares.</p>
+                    <a href="materiales.html" class="btn btn-primary">Ver Proyecto</a>
+                </div>
+
+                <div class="propuesta-glass">
+                    <h3><img src="images/pared creativa derecha.png" alt="Pared Creativa" style="width:35px;height:35px;margin-right:10px;"> Pared Creativa</h3>
+                    <p>Espacio para expresión artística de toda la comunidad.</p>
+                    <a href="pared-creativa.html" class="btn btn-primary">Conocer</a>
+                </div>
+
                 <div class="propuesta-glass">
                     <h3><img src="images/E.S.E.N.C.I.A izquierda.png" alt="ESENCIA" style="width:35px;height:35px;margin-right:10px;"> E.S.E.N.C.I.A</h3>
                     <p>Reforma del sistema educativo para mayor flexibilidad.</p>
@@ -273,6 +298,7 @@
 
     <footer class="footer">
         <p style="color: white;">&copy; 2026 Manos Unidas - Centro de Estudiantes</p>
+        <p style="color: rgba(255,255,255,0.8);">Construyendo el futuro juntos</p>
     </footer>
 
     <script src="js/auth.js"></script>
@@ -298,11 +324,13 @@
         }
 
         function logout() {
-            if (confirm('¿Estás seguro?')) {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
                 auth.logout();
                 updateUserMenu();
+                alert('Sesión cerrada');
             }
         }
+
         updateUserMenu();
     </script>
     <script src="js/sivia-flotante.js"></script>

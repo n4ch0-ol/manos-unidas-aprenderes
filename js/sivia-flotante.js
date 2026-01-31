@@ -1,453 +1,146 @@
-// ============================================
-// SIVIA FLOTANTE - Componente Reutilizable
-// ============================================
-
 const SIVIA_API_URL = "https://sivia-backend.onrender.com/chat";
 let knowledgeBase = null;
+let selectedImageBase64 = null;
 
-// Cargar base de datos JSON
 async function loadKnowledgeBase() {
     try {
         const response = await fetch('data/sivia-knowledge-base.json');
         knowledgeBase = await response.json();
-        console.log('📚 Base de conocimiento cargada:', knowledgeBase);
     } catch (error) {
-        console.warn('No se pudo cargar la base de conocimiento local:', error);
+        console.warn('No se pudo cargar la base local.');
     }
 }
 
-// Buscar respuesta en la base de datos local
 function searchLocalKnowledge(question) {
     if (!knowledgeBase) return null;
-    
     const lowerQuestion = question.toLowerCase();
-    
-    // Buscar en FAQs
     for (let faq of knowledgeBase.preguntas_frecuentes) {
-        if (lowerQuestion.includes(faq.pregunta.toLowerCase().split(' ').slice(0, 3).join(' '))) {
-            return faq.respuesta;
-        }
+        if (lowerQuestion.includes(faq.pregunta.toLowerCase().split(' ').slice(0, 3).join(' '))) return faq.respuesta;
     }
-    
-    // Buscar en proyectos
     for (let proyecto of knowledgeBase.proyectos) {
-        if (lowerQuestion.includes(proyecto.nombre.toLowerCase())) {
-            return proyecto.descripcion;
-        }
+        if (lowerQuestion.includes(proyecto.nombre.toLowerCase())) return proyecto.descripcion;
     }
-    
-    // Buscar en formularios
-    for (let form of knowledgeBase.formularios) {
-        if (lowerQuestion.includes(form.nombre.toLowerCase())) {
-            return `Puedes usar el formulario "${form.nombre}" (${form.emoji}) para ${form.descripcion}.`;
-        }
-    }
-    
     return null;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Cargar base de conocimiento
     loadKnowledgeBase();
     
-    // CSS para la ventana flotante
     const style = document.createElement('style');
     style.textContent = `
-        .sivia-btn-float {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background-image: url('images/sivia recuadro derecho.png');
-            background-size: cover;
-            background-position: center;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5);
-            z-index: 9998;
-            transition: all 0.3s;
-            animation: pulseBtn 2s infinite;
-        }
-
-        @keyframes pulseBtn {
-            0%, 100% { box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5); }
-            50% { box-shadow: 0 4px 30px rgba(255, 0, 255, 0.7); }
-        }
-
-        .sivia-btn-float:hover {
-            transform: scale(1.1);
-        }
-
-        .sivia-window {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 380px;
-            height: 500px;
-            background: rgba(26, 26, 46, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            display: none;
-            flex-direction: column;
-            z-index: 9999;
-            animation: slideUp 0.3s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .sivia-window.active {
-            display: flex;
-        }
-
-        .sivia-window-header {
-            padding: 1rem;
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 255, 0.2));
-            border-radius: 20px 20px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sivia-window-header h3 {
-            color: white;
-            margin: 0;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .sivia-logo-header {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-        }
-
-        .sivia-close {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.3s;
-        }
-
-        .sivia-close:hover {
-            opacity: 1;
-        }
-
-        .sivia-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .sivia-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .sivia-messages::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .sivia-messages::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, #00f0ff, #ff00ff);
-            border-radius: 10px;
-        }
-
-        .sivia-msg {
-            display: flex;
-            gap: 0.8rem;
-            animation: msgSlide 0.3s ease-out;
-        }
-
-        @keyframes msgSlide {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .sivia-msg.user {
-            flex-direction: row-reverse;
-        }
-
-        .sivia-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .sivia-avatar.sivia-icon {
-            background-image: url('images/sivia recuadro derecho.png');
-        }
-
-        .sivia-avatar.user-icon {
-            background: linear-gradient(135deg, #ff00ff, #00f0ff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        .sivia-msg-content {
-            background: rgba(0, 240, 255, 0.1);
-            padding: 0.8rem;
-            border-radius: 12px;
-            max-width: 75%;
-            border: 1px solid rgba(0, 240, 255, 0.2);
-        }
-
-        .sivia-msg.user .sivia-msg-content {
-            background: rgba(255, 0, 255, 0.1);
-            border-color: rgba(255, 0, 255, 0.2);
-        }
-
-        .sivia-msg-content p {
-            margin: 0;
-            color: white;
-            font-size: 0.9rem;
-            line-height: 1.4;
-        }
-
-        .sivia-typing {
-            display: none;
-            gap: 0.3rem;
-            padding: 0.8rem;
-            background: rgba(0, 240, 255, 0.1);
-            border-radius: 12px;
-            width: fit-content;
-        }
-
-        .sivia-typing.active {
-            display: flex;
-        }
-
-        .sivia-typing span {
-            width: 6px;
-            height: 6px;
-            background: #00f0ff;
-            border-radius: 50%;
-            animation: typingBounce 1.4s infinite;
-        }
-
-        .sivia-typing span:nth-child(2) { animation-delay: 0.2s; }
-        .sivia-typing span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typingBounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-8px); }
-        }
-
-        .sivia-input-container {
-            padding: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .sivia-input-form {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .sivia-input {
-            flex: 1;
-            padding: 0.7rem;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 240, 255, 0.3);
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            font-size: 0.9rem;
-        }
-
-        .sivia-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .sivia-send {
-            padding: 0.7rem 1.2rem;
-            border-radius: 10px;
-            border: none;
-            background: linear-gradient(135deg, #00f0ff, #ff00ff);
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.3s;
-        }
-
-        .sivia-send:hover {
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 768px) {
-            .sivia-window {
-                width: calc(100% - 40px);
-                height: 60vh;
-                left: 20px;
-                right: 20px;
-                bottom: 90px;
-            }
-        }
+        .sivia-btn-float { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background-image: url('images/sivia recuadro derecho.png'); background-size: cover; border-radius: 50%; border: none; cursor: pointer; z-index: 9998; animation: pulseBtn 2s infinite; }
+        @keyframes pulseBtn { 0%, 100% { box-shadow: 0 4px 20px rgba(0, 240, 255, 0.5); } 50% { box-shadow: 0 4px 30px rgba(255, 0, 255, 0.7); } }
+        .sivia-window { position: fixed; bottom: 90px; right: 20px; width: 380px; height: 500px; background: rgba(26, 26, 46, 0.95); backdrop-filter: blur(20px); border-radius: 20px; border: 1px solid rgba(0, 240, 255, 0.3); display: none; flex-direction: column; z-index: 9999; }
+        .sivia-window.active { display: flex; }
+        .sivia-window-header { padding: 1rem; background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(255, 0, 255, 0.2)); border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        .sivia-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+        .sivia-msg { display: flex; gap: 0.8rem; }
+        .sivia-msg.user { flex-direction: row-reverse; }
+        .sivia-avatar { width: 35px; height: 35px; border-radius: 50%; background-size: cover; }
+        .sivia-avatar.sivia-icon { background-image: url('images/sivia recuadro derecho.png'); }
+        .sivia-avatar.user-icon { background: linear-gradient(135deg, #ff00ff, #00f0ff); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .sivia-msg-content { background: rgba(0, 240, 255, 0.1); padding: 0.8rem; border-radius: 12px; max-width: 75%; color: white; font-size: 0.9rem; }
+        .sivia-input-container { padding: 1rem; background: rgba(0, 0, 0, 0.2); }
+        .sivia-input-form { display: flex; gap: 0.5rem; align-items: center; }
+        .sivia-input { flex: 1; padding: 0.7rem; border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.3); background: rgba(255, 255, 255, 0.05); color: white; }
+        .sivia-file-btn { background: none; border: none; color: #00f0ff; font-size: 1.5rem; cursor: pointer; }
+        .sivia-preview { width: 40px; height: 40px; border-radius: 5px; display: none; object-fit: cover; }
+        .sivia-typing { display: none; padding: 1rem; gap: 0.3rem; }
+        .sivia-typing.active { display: flex; }
+        .sivia-typing span { width: 6px; height: 6px; background: #00f0ff; border-radius: 50%; animation: typingBounce 1.4s infinite; }
+        @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-8px); } }
     `;
     document.head.appendChild(style);
 
-    // HTML del componente
     const html = `
         <button class="sivia-btn-float" id="siviaBtn"></button>
-        
         <div class="sivia-window" id="siviaWindow">
             <div class="sivia-window-header">
-                <h3><img src="images/sivia recuadro derecho.png" class="sivia-logo-header" alt="SIVIA"> SIVIA</h3>
-                <button class="sivia-close" id="siviaClose">×</button>
+                <h3 style="color:white; margin:0;"><img src="images/sivia recuadro derecho.png" style="width:30px; vertical-align:middle;"> SIVIA</h3>
+                <button id="siviaClose" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">×</button>
             </div>
-            
-            <div class="sivia-messages" id="siviaMessages">
-                <div class="sivia-msg">
-                    <div class="sivia-avatar sivia-icon"></div>
-                    <div class="sivia-msg-content">
-                        <p>¡Hola! Soy SIVIA, tu asistente de Manos Unidas. ¿En qué puedo ayudarte?</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="sivia-typing" id="siviaTyping">
-                <div class="sivia-avatar sivia-icon"></div>
-                <div style="display: flex; gap: 0.3rem;">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-            
+            <div class="sivia-messages" id="siviaMessages"></div>
+            <div class="sivia-typing" id="siviaTyping"><span></span><span></span><span></span></div>
             <div class="sivia-input-container">
+                <img id="siviaThumb" class="sivia-preview">
                 <form class="sivia-input-form" id="siviaForm">
-                    <input type="text" class="sivia-input" id="siviaInput" placeholder="Escribe tu pregunta..." autocomplete="off">
-                    <button type="submit" class="sivia-send">Enviar</button>
+                    <button type="button" class="sivia-file-btn" id="siviaClip">📎</button>
+                    <input type="file" id="siviaFile" style="display:none" accept="image/*">
+                    <input type="text" class="sivia-input" id="siviaInput" placeholder="Escribe..." autocomplete="off">
+                    <button type="submit" style="background:linear-gradient(135deg,#00f0ff,#ff00ff); border:none; padding:0.7rem; border-radius:10px; color:white; cursor:pointer;">Enviar</button>
                 </form>
             </div>
         </div>
     `;
-    
     document.body.insertAdjacentHTML('beforeend', html);
 
-    // Funcionalidad
-    const btn = document.getElementById('siviaBtn');
-    const window = document.getElementById('siviaWindow');
-    const closeBtn = document.getElementById('siviaClose');
-    const form = document.getElementById('siviaForm');
-    const input = document.getElementById('siviaInput');
-    const messages = document.getElementById('siviaMessages');
+    const btn = document.getElementById('siviaBtn'), win = document.getElementById('siviaWindow'), close = document.getElementById('siviaClose');
+    const form = document.getElementById('siviaForm'), input = document.getElementById('siviaInput'), messages = document.getElementById('siviaMessages');
+    const clip = document.getElementById('siviaClip'), fileInput = document.getElementById('siviaFile'), thumb = document.getElementById('siviaThumb');
     const typing = document.getElementById('siviaTyping');
 
-    btn.addEventListener('click', () => {
-        window.classList.add('active');
-    });
+    btn.onclick = () => win.classList.add('active');
+    close.onclick = () => win.classList.remove('active');
+    clip.onclick = () => fileInput.click();
 
-    closeBtn.addEventListener('click', () => {
-        window.classList.remove('active');
-    });
+    fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedImageBase64 = e.target.result.split(',')[1];
+                thumb.src = e.target.result;
+                thumb.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
-    form.addEventListener('submit', async (e) => {
+    form.onsubmit = async (e) => {
         e.preventDefault();
-        const question = input.value.trim();
-        if (!question) return;
+        const text = input.value.trim();
+        if (!text && !selectedImageBase64) return;
 
-        // Mensaje del usuario
-        addMessage(question, true);
-        input.value = '';
-
-        // Mostrar typing
+        addMessage(text || "Imagen enviada", true);
+        input.value = ''; thumb.style.display = 'none';
         typing.classList.add('active');
 
-        // Primero intentar buscar en la base local
-        const localResponse = searchLocalKnowledge(question);
-        
-        if (localResponse) {
-            // Si encontró respuesta local, usarla
+        const local = searchLocalKnowledge(text);
+        if (local && !selectedImageBase64) {
             typing.classList.remove('active');
-            addMessage(localResponse, false);
+            addMessage(local, false);
         } else {
-            // Si no, consultar la API
             try {
-                const response = await fetch(SIVIA_API_URL, {
+                const res = await fetch(SIVIA_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        question,
-                        knowledgeBase: knowledgeBase // Enviar la base de datos también
-                    })
+                    body: JSON.stringify({ question: text, image: selectedImageBase64 })
                 });
-
-                const data = await response.json();
+                const data = await res.json();
                 typing.classList.remove('active');
-                addMessage(data.answer || 'Lo siento, tuve un problema.', false);
-            } catch (error) {
+                
+                let answer = data.answer;
+                if (answer.includes("https://image.pollinations.ai")) {
+                    const url = answer.match(/https?:\/\/[^\s]+/g)[0];
+                    answer = answer.replace(url, `<br><img src="${url}" style="width:100%; border-radius:10px; margin-top:10px;">`);
+                }
+                addMessage(answer, false);
+            } catch (err) {
                 typing.classList.remove('active');
-                addMessage('Error de conexión. Verifica que el backend esté activo.', false);
-                console.error('Error:', error);
+                addMessage('Error de conexión.', false);
             }
         }
-    });
+        selectedImageBase64 = null;
+    };
 
     function addMessage(text, isUser) {
         const msg = document.createElement('div');
         msg.className = `sivia-msg ${isUser ? 'user' : ''}`;
-        
-        if (isUser) {
-            msg.innerHTML = `
-                <div class="sivia-avatar user-icon">U</div>
-                <div class="sivia-msg-content">
-                    <p>${text}</p>
-                </div>
-            `;
-        } else {
-            msg.innerHTML = `
-                <div class="sivia-avatar sivia-icon"></div>
-                <div class="sivia-msg-content">
-                    <p>${text}</p>
-                </div>
-            `;
-        }
-        
+        msg.innerHTML = `
+            <div class="sivia-avatar ${isUser ? 'user-icon' : 'sivia-icon'}">${isUser ? 'U' : ''}</div>
+            <div class="sivia-msg-content"><p>${text}</p></div>
+        `;
         messages.appendChild(msg);
         messages.scrollTop = messages.scrollHeight;
     }
-
-    // Atajo de teclado Ctrl+K
-    document.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            if (window.classList.contains('active')) {
-                closeBtn.click();
-            } else {
-                btn.click();
-            }
-        }
-    });
 });

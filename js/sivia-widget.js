@@ -1,7 +1,7 @@
 (function() {
     // ================= CONFIGURACIÓN =================
     const BACKEND_URL = "https://sivia-backend.onrender.com/chat";
-    const LOGO_PATH = "sivia recuadro derecho.png"; // Asegúrate que la imagen esté junto al HTML
+    const LOGO_PATH = "images/sivia recuadro derecho.png";
     
     // Frases de la animación "Gemini Style"
     const thinkingSteps = [

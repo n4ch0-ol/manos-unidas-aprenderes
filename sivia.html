@@ -3,64 +3,376 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIVIA - Manos Unidas</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>SIVIA Widget</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        body { background-image: url('images/manos_unidas_oscuro.png'); background-size: cover; background-position: center; background-attachment: fixed; }
-        .chat-container { max-width: 800px; margin: 2rem auto; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 25px; border: 1px solid rgba(255, 255, 255, 0.2); overflow: hidden; }
-        .chat-header { background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(255, 0, 255, 0.3)); padding: 1.5rem; text-align: center; color: white; }
-        .chat-messages { padding: 2rem; height: 500px; overflow-y: auto; color: white; }
-        .message { margin-bottom: 1rem; display: flex; gap: 1rem; }
-        .message.user { flex-direction: row-reverse; }
-        .message-content { background: rgba(255, 255, 255, 0.15); padding: 1rem; border-radius: 15px; max-width: 70%; }
-        .chat-input { padding: 1.5rem; background: rgba(0, 0, 0, 0.2); display: flex; gap: 10px; }
-        input { flex: 1; padding: 0.8rem; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white; }
-        button { padding: 0.8rem 2rem; border-radius: 10px; border: none; background: linear-gradient(135deg, #00f0ff, #ff00ff); color: white; cursor: pointer; }
+        /* --- ESTILOS SIVIA WIDGET --- */
+        :root {
+            --primary-color: #4facfe;
+            --secondary-color: #00f2fe;
+            --bg-dark: #0f172a;
+            --glass-bg: rgba(15, 23, 42, 0.85);
+            --user-msg-bg: #2563eb;
+            --bot-msg-bg: #1e293b;
+        }
+
+        /* Botón Flotante */
+        .sivia-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 9999;
+            transition: transform 0.3s ease;
+        }
+        .sivia-trigger:hover { transform: scale(1.1); }
+        .sivia-trigger span { font-size: 32px; color: white; }
+
+        /* Ventana del Chat */
+        .sivia-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 380px;
+            height: 600px;
+            max-height: 80vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden;
+        }
+
+        .sivia-window.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        /* Header */
+        .sivia-header {
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+        .sivia-brand { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .sivia-logo-anim {
+            width: 30px; height: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        .close-btn { cursor: pointer; opacity: 0.7; }
+        .close-btn:hover { opacity: 1; }
+
+        /* Area de Mensajes */
+        .sivia-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            color: #e2e8f0;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+        .message.user {
+            align-self: flex-end;
+            background: var(--user-msg-bg);
+            border-bottom-right-radius: 2px;
+        }
+        .message.bot {
+            align-self: flex-start;
+            background: var(--bot-msg-bg);
+            border-bottom-left-radius: 2px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .message img { max-width: 100%; border-radius: 8px; margin-top: 5px; }
+
+        /* Animación de Pensamiento (GEMINI STYLE) */
+        .thinking-indicator {
+            display: none;
+            align-self: flex-start;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 20px;
+            padding: 8px 16px;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .thinking-indicator.active { display: flex; }
+        
+        .gemini-spinner {
+            width: 16px; height: 16px;
+            border: 2px solid transparent;
+            border-top-color: var(--secondary-color);
+            border-right-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .thinking-text {
+            font-size: 12px;
+            color: var(--secondary-color);
+            font-weight: 500;
+            min-width: 180px;
+        }
+
+        /* Input Area */
+        .sivia-input-area {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        #file-upload { display: none; }
+        .attach-btn {
+            color: #94a3b8;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .attach-btn:hover { color: var(--secondary-color); }
+        .attach-btn.has-file { color: #4ade80; } /* Verde cuando hay archivo */
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            color: white;
+            outline: none;
+        }
+        .chat-input::placeholder { color: rgba(255,255,255,0.3); }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .send-btn:hover { transform: scale(1.1); }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(79, 172, 254, 0); } 100% { box-shadow: 0 0 0 0 rgba(79, 172, 254, 0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Markdown básico en CSS */
+        .message.bot strong { color: var(--secondary-color); }
+        .message.bot ul { margin-left: 20px; }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header"><h1>SIVIA</h1></div>
-        <div class="chat-messages" id="messages"></div>
-        <form class="chat-input" id="chatForm">
-            <input type="text" id="userInput" placeholder="Escribe tu pregunta..." autocomplete="off">
-            <button type="submit">Enviar</button>
-        </form>
+
+    <div class="sivia-trigger" onclick="toggleSivia()">
+        <span class="material-icons-round">smart_toy</span>
+    </div>
+
+    <div class="sivia-window" id="siviaWindow">
+        <div class="sivia-header">
+            <div class="sivia-brand">
+                <div class="sivia-logo-anim"></div>
+                <span>SIVIA AI</span>
+            </div>
+            <span class="material-icons-round close-btn" onclick="toggleSivia()">close</span>
+        </div>
+
+        <div class="sivia-messages" id="chatMessages">
+            <div class="message bot">
+                Hola, soy SIVIA. 🤖<br>
+                Puedo buscar en internet, ver imágenes y consultar la base de datos.<br>
+                ¿En qué te ayudo hoy?
+            </div>
+        </div>
+
+        <div class="thinking-indicator" id="loader">
+            <div class="gemini-spinner"></div>
+            <div class="thinking-text" id="thinkingText">Analizando solicitud...</div>
+        </div>
+
+        <div class="sivia-input-area">
+            <label for="file-upload" class="attach-btn" id="attachBtn">
+                <span class="material-icons-round">attach_file</span>
+            </label>
+            <input type="file" id="file-upload" accept="image/*">
+            
+            <input type="text" class="chat-input" id="userInput" placeholder="Escribe tu pregunta..." onkeypress="handleEnter(event)">
+            
+            <button class="send-btn" onclick="sendMessage()">
+                <span class="material-icons-round">send</span>
+            </button>
+        </div>
     </div>
 
     <script>
-        const SIVIA_API = "https://sivia-backend.onrender.com/chat";
-        const form = document.getElementById('chatForm'), input = document.getElementById('userInput'), msgContainer = document.getElementById('messages');
+        // --- CONFIGURACIÓN ---
+        // ⚠️ CAMBIA ESTO POR TU URL DE RENDER
+        const BACKEND_URL = "https://tu-nombre-de-app.onrender.com/chat"; 
 
-        form.onsubmit = async (e) => {
-            e.preventDefault();
+        // Variables de estado
+        let currentImageBase64 = null;
+        const thinkingPhrases = [
+            "🔍 Buscando en la web...",
+            "📂 Consultando base de datos...",
+            "⚡ Analizando información...",
+            "🌐 Verificando fuentes confiables...",
+            "🎨 Procesando contexto visual...",
+            "✍️ Redactando respuesta..."
+        ];
+
+        // Abrir/Cerrar Chat
+        function toggleSivia() {
+            document.getElementById('siviaWindow').classList.toggle('active');
+        }
+
+        // Manejo de Enter
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        // Manejo de Archivos (El Clip)
+        document.getElementById('file-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    currentImageBase64 = reader.result.split(',')[1]; // Guardar solo la data base64
+                    document.getElementById('attachBtn').classList.add('has-file'); // Poner verde el clip
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Lógica de Animación de Texto (El toque Gemini)
+        let thinkInterval;
+        function startThinkingAnim() {
+            const loader = document.getElementById('loader');
+            const textEl = document.getElementById('thinkingText');
+            loader.classList.add('active');
+            
+            let i = 0;
+            textEl.innerText = thinkingPhrases[0]; // Texto inicial
+            
+            thinkInterval = setInterval(() => {
+                i = (i + 1) % thinkingPhrases.length;
+                textEl.innerText = thinkingPhrases[i];
+            }, 1500); // Cambia frase cada 1.5 seg
+        }
+
+        function stopThinkingAnim() {
+            clearInterval(thinkInterval);
+            document.getElementById('loader').classList.remove('active');
+        }
+
+        // Renderizar mensajes
+        function appendMessage(text, sender, imgData = null) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            
+            // Si es bot, permitimos formato básico HTML/Markdown
+            if (sender === 'bot') {
+                // Convertir links simples a clickeables (regex básico)
+                let formatted = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#00f2fe">$1</a>');
+                // Negritas **texto** a <strong>
+                formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                div.innerHTML = formatted;
+            } else {
+                div.textContent = text;
+            }
+
+            // Si el usuario subió imagen, mostrar miniatura
+            if (imgData && sender === 'user') {
+                const img = document.createElement('img');
+                img.src = "data:image/jpeg;base64," + imgData;
+                div.appendChild(img);
+            }
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // --- FUNCIÓN PRINCIPAL DE ENVÍO ---
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
             const text = input.value.trim();
-            if(!text) return;
-            addMsg(text, true); input.value = '';
+            
+            if (!text && !currentImageBase64) return;
+
+            // 1. Mostrar mensaje usuario
+            appendMessage(text, 'user', currentImageBase64);
+            input.value = '';
+            
+            // 2. Activar animación de "Pensando"
+            startThinkingAnim();
 
             try {
-                const res = await fetch(SIVIA_API, {
+                // 3. Petición al Backend
+                const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question: text })
+                    body: JSON.stringify({
+                        question: text,
+                        image: currentImageBase64
+                    })
                 });
-                const data = await res.json();
-                let ans = data.answer;
-                if(ans.includes("https://image.pollinations.ai")) {
-                    const url = ans.match(/https?:\/\/[^\s]+/g)[0];
-                    ans = ans.replace(url, `<br><img src="${url}" style="width:100%; border-radius:10px;">`);
-                }
-                addMsg(ans, false);
-            } catch { addMsg("Error de conexión", false); }
-        };
 
-        function addMsg(t, u) {
-            const d = document.createElement('div');
-            d.className = `message ${u ? 'user' : ''}`;
-            d.innerHTML = `<div class="message-content"><p>${t}</p></div>`;
-            msgContainer.appendChild(d);
-            msgContainer.scrollTop = msgContainer.scrollHeight;
+                const data = await response.json();
+                
+                // 4. Detener animación y mostrar respuesta
+                stopThinkingAnim();
+                appendMessage(data.answer, 'bot');
+
+            } catch (error) {
+                stopThinkingAnim();
+                appendMessage("⚠️ Error de conexión con SIVIA.", 'bot');
+                console.error(error);
+            }
+
+            // 5. Limpiar estado de imagen
+            currentImageBase64 = null;
+            document.getElementById('file-upload').value = "";
+            document.getElementById('attachBtn').classList.remove('has-file');
         }
     </script>
+
 </body>
 </html>

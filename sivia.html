@@ -10,8 +10,8 @@
     <style>
         /* --- ESTILOS GENERALES --- */
         :root {
-            --bg-dark: #0f172a;
-            --bg-panel: #1e293b;
+            --bg-overlay: rgba(15, 23, 42, 0.85); /* Capa oscura sobre la imagen de fondo */
+            --bg-panel: rgba(30, 41, 59, 0.7);   /* Paneles semitransparentes */
             --accent: #38bdf8; /* Azul SIVIA */
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -24,12 +24,28 @@
             margin: 0;
             padding: 0;
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
             color: var(--text-main);
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Evita scroll en el body */
+            overflow: hidden;
+
+            /* --- CONFIGURACIÓN DEL FONDO --- */
+            background-image: url('images/manos_unidas_oscuro.png'); /* TU IMAGEN DE FONDO */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #0f172a; /* Color de respaldo */
+        }
+
+        /* Capa oscura para mejorar la lectura sobre la imagen de fondo */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-overlay);
+            z-index: -1;
+            backdrop-filter: blur(3px); /* Opcional: un ligero desenfoque al fondo */
         }
 
         /* --- CABECERA --- */
@@ -40,7 +56,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 30px;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.6); /* Cabecera semitransparente */
+            backdrop-filter: blur(10px);
         }
 
         .brand-area {
@@ -51,8 +68,10 @@
 
         .brand-logo {
             height: 40px;
-            width: auto;
-            object-fit: contain;
+            width: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
         .brand-text {
@@ -72,7 +91,7 @@
             display: flex;
             flex-direction: column;
             gap: 25px;
-            max-width: 900px; /* Ancho máximo estilo Gemini */
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
             scrollbar-width: thin;
@@ -94,9 +113,21 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            overflow: hidden; /* Para recortar la imagen */
         }
-        .avatar.bot { background: linear-gradient(135deg, #1e293b, #334155); color: var(--accent); border: 1px solid rgba(255,255,255,0.1); }
+        /* Estilo para el contenedor del logo del bot */
+        .avatar.bot { 
+            background: transparent; /* Fondo transparente para la imagen */
+            border: 1px solid rgba(255,255,255,0.1); 
+        }
         .avatar.user { background: var(--user-bubble); color: white; }
+
+        /* Estilo de la imagen dentro del avatar */
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
         .content {
             flex: 1;
@@ -113,13 +144,17 @@
         .text-bubble {
             font-size: 16px;
             color: #e2e8f0;
+            background: var(--bg-panel); /* Fondo semitransparente para el texto */
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         
         /* Markdown básico */
         .text-bubble strong { color: var(--accent); }
         .text-bubble a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted; }
         .text-bubble img { 
-            max-width: 400px; 
+            max-width: 100%;
             border-radius: 12px; 
             margin-top: 10px; 
             border: 1px solid rgba(255,255,255,0.2);
@@ -156,8 +191,8 @@
         /* --- ÁREA DE INPUT (Abajo) --- */
         .input-wrapper {
             padding: 20px;
-            background: var(--bg-dark);
-            /* border-top: 1px solid rgba(255,255,255,0.05); */
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .input-box {
@@ -217,7 +252,7 @@
         .footer-note {
             text-align: center;
             font-size: 11px;
-            color: #475569;
+            color: #94a3b8;
             margin-top: 10px;
         }
 
@@ -234,19 +269,18 @@
             <img src="images/sivia recuadro derecho.png" alt="SIVIA" class="brand-logo" onerror="this.style.display='none'">
             <span class="brand-text">SIVIA Chat</span>
         </div>
-        <div style="color: var(--text-muted); cursor: pointer;">
-            <span class="material-icons-round">settings</span>
-        </div>
     </header>
 
     <div class="chat-container" id="chat-stream">
         
         <div class="message">
-            <div class="avatar bot"><img /images/sivia recuadro derecho.png> </img> </div>
+            <div class="avatar bot">
+                <img src="images/sivia recuadro derecho.png" alt="SIVIA">
+            </div>
             <div class="content">
                 <div class="user-name">SIVIA AI</div>
                 <div class="text-bubble">
-                    ¡Hola! Soy tu asistente virtual inteligente. 🤖<br><br>
+                    ¡Hola! Soy tu asistente virtual inteligente. 👋<br><br>
                     Puedo:<br>
                     🌍 <strong>Buscar en internet</strong> información actualizada.<br>
                     📊 <strong>Consultar la base de datos</strong> interna.<br>
@@ -281,8 +315,8 @@
 
     <script>
         const API_URL = "https://sivia-backend.onrender.com/chat";
-        
-        // Frases para la animación
+        const LOGO_PATH = "images/sivia recuadro derecho.png"; // Ruta del logo
+
         const STEPS = [
             "🌎 Investigando en la web...",
             "🔍 Verificando fuentes...",
@@ -297,13 +331,11 @@
 
         // --- FUNCIONES VISUALES ---
 
-        // Auto-scroll al fondo
         function scrollToBottom() {
             const container = document.getElementById('chat-stream');
             container.scrollTop = container.scrollHeight;
         }
 
-        // Manejo del Clip
         document.getElementById('file-upload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -316,17 +348,13 @@
             }
         });
 
-        // Animación "Pensando"
         function startThinking() {
             const wrapper = document.getElementById('thinking-indicator');
             const textEl = document.getElementById('thinking-status');
-            
             wrapper.classList.add('active');
-            scrollToBottom(); // Asegurar que se ve la animación
-            
+            scrollToBottom();
             let i = 0;
             textEl.innerText = STEPS[0];
-            
             thinkingInterval = setInterval(() => {
                 i = (i + 1) % STEPS.length;
                 textEl.innerText = STEPS[i];
@@ -338,33 +366,36 @@
             document.getElementById('thinking-indicator').classList.remove('active');
         }
 
-        // Agregar mensaje al HTML
+        // FUNCIÓN MODIFICADA PARA USAR EL LOGO EN LUGAR DEL ROBOT
         function addMessage(text, sender, imgData = null) {
             const container = document.getElementById('chat-stream');
-            
-            // Crear HTML del mensaje
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message';
             
-            const icon = sender === 'bot' ? 'smart_toy' : 'person';
             const name = sender === 'bot' ? 'SIVIA AI' : 'Tú';
             const avatarClass = sender === 'bot' ? 'bot' : 'user';
 
+            // Lógica del avatar: Logo para bot, Icono para usuario
+            let avatarHTML;
+            if (sender === 'bot') {
+                avatarHTML = `<img src="${LOGO_PATH}" alt="SIVIA">`;
+            } else {
+                avatarHTML = `<span class="material-icons-round">person</span>`;
+            }
+
             let contentHTML = text;
             if (sender === 'bot') {
-                // Formato básico
                 contentHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                                   .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
             }
 
-            // Si hay imagen del usuario
             let imgHTML = '';
             if (sender === 'user' && imgData) {
                 imgHTML = `<img src="data:image/jpeg;base64,${imgData}">`;
             }
 
             msgDiv.innerHTML = `
-                <div class="avatar ${avatarClass}"><span class="material-icons-round">${icon}</span></div>
+                <div class="avatar ${avatarClass}">${avatarHTML}</div>
                 <div class="content">
                     <div class="user-name">${name}</div>
                     <div class="text-bubble">${contentHTML} ${imgHTML}</div>
@@ -383,23 +414,17 @@
 
             if (!text && !currentImageBase64) return;
 
-            // 1. Mostrar mensaje del usuario
             addMessage(text, 'user', currentImageBase64);
             
-            // 2. Limpiar input
             input.value = '';
             input.disabled = true;
-            btn.style.color = '#475569'; // Desactivar visualmente
-            
-            // Reset clip
+            btn.style.color = '#475569';
             document.getElementById('clip-btn').classList.remove('has-file');
             document.getElementById('file-upload').value = '';
 
-            // 3. Iniciar animación
             startThinking();
 
             try {
-                // 4. Llamada al Backend
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -410,18 +435,14 @@
                 });
 
                 const data = await response.json();
-
-                // 5. Respuesta recibida
                 stopThinking();
                 addMessage(data.answer, 'bot');
 
             } catch (error) {
                 stopThinking();
                 addMessage("⚠️ Error de conexión. El servidor puede estar 'durmiendo' (espera 30s) o no tienes internet.", 'bot');
-                console.error(error);
             }
 
-            // 6. Reactivar inputs
             currentImageBase64 = null;
             input.disabled = false;
             btn.style.color = ''; 
@@ -429,12 +450,9 @@
             scrollToBottom();
         }
 
-        // Detectar Enter
         document.getElementById('user-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleSend();
         });
-
-        // Foco inicial
         document.getElementById('user-input').focus();
 
     </script>

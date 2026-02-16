@@ -33,105 +33,58 @@
     </script>
 
     <style>
-        /* ESTILOS GENERALES Y TAILWIND FIXES */
-        body {
-            font-family: 'Outfit', sans-serif;
-        }
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Space Grotesk', sans-serif;
-        }
+        /* ESTILOS GENERALES */
+        body { font-family: 'Outfit', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
         
-        /* ESTILOS DE LA NAVBAR (Importados de tu HTML) */
+        /* NAVBAR */
         .navbar {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+            top: 0; left: 0; width: 100%;
             padding: 1rem 2rem;
-            background: rgba(15, 23, 42, 0.85); /* Adaptado al tema oscuro */
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(10px);
             z-index: 1000;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             transition: all 0.3s ease;
         }
         .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1200px; margin: 0 auto;
         }
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            gap: 10px;
-        }
-        .logo-svg {
-            width: 50px;
-            height: 50px;
-            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
-        }
+        .logo { display: flex; align-items: center; text-decoration: none; gap: 10px; }
+        .logo-svg { width: 50px; height: 50px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
         .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.5rem; font-weight: 700;
             background: linear-gradient(45deg, #ff6b6b, #48dbfb);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-family: 'Space Grotesk', sans-serif;
+            -webkit-background-clip: text; background-clip: text;
+            color: transparent; font-family: 'Space Grotesk', sans-serif;
         }
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-            margin: 0;
-            padding: 0;
-        }
+        .nav-links { display: flex; list-style: none; gap: 2rem; align-items: center; margin: 0; padding: 0; }
         .nav-link {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
+            color: white; text-decoration: none; font-weight: 500;
+            transition: all 0.3s ease; position: relative;
         }
-        .nav-link:hover {
-            color: #48dbfb;
-            text-shadow: 0 0 10px rgba(72,219,251,0.5);
-        }
+        .nav-link:hover { color: #48dbfb; text-shadow: 0 0 10px rgba(72,219,251,0.5); }
         
-        /* Sidebar styles */
+        /* Sidebar */
         .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: #00f0ff;
-            font-size: 2rem;
-            cursor: pointer;
-            margin-right: 15px;
+            display: none; background: none; border: none;
+            color: #00f0ff; font-size: 2rem; cursor: pointer; margin-right: 15px;
         }
         .sidebar {
-            position: fixed;
-            top: 0; 
-            left: -300px; /* Oculto por defecto */
-            width: 280px; 
-            height: 100vh;
+            position: fixed; top: 0; left: -300px;
+            width: 280px; height: 100vh;
             background: rgba(10, 10, 15, 0.98);
             backdrop-filter: blur(15px);
             border-right: 1px solid #00f0ff;
-            z-index: 2000;
-            padding: 2rem;
-            transition: left 0.4s ease;
-            display: flex;
-            flex-direction: column;
+            z-index: 2000; padding: 2rem;
+            transition: left 0.4s ease; display: flex; flex-direction: column;
         }
         .sidebar.active { left: 0; }
         .close-sidebar {
-            align-self: flex-end;
-            background: none; border: none;
-            color: white; font-size: 2.5rem;
-            cursor: pointer; margin-bottom: 2rem;
+            align-self: flex-end; background: none; border: none;
+            color: white; font-size: 2.5rem; cursor: pointer; margin-bottom: 2rem;
         }
         .sidebar-links { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; padding: 0; }
         
@@ -140,61 +93,41 @@
             .nav-links { display: none; }
         }
 
-        /* ESTILOS 3D CARDS (Mantenidos) */
-        .card-3d-wrapper {
-            perspective: 1500px;
-            transform-style: preserve-3d;
-        }
+        /* 3D CARDS */
+        .card-3d-wrapper { perspective: 1500px; transform-style: preserve-3d; }
         .card-3d {
             transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             transform-style: preserve-3d;
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
         .card-3d:hover {
             transform: rotateX(5deg) rotateY(-5deg) translateZ(20px) translateY(-10px);
-            box-shadow: 
-                -10px 10px 40px -5px rgba(0,0,0,0.4),
-                inset 0 1px 0 rgba(255,255,255,0.2),
-                0 0 20px rgba(132, 204, 22, 0.1);
+            box-shadow: -10px 10px 40px -5px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2), 0 0 20px rgba(132, 204, 22, 0.1);
             border-color: rgba(255, 255, 255, 0.3);
             z-index: 10;
         }
-        .card-content-lift {
-            transform: translateZ(30px);
-            transform-style: preserve-3d;
-        }
-        .card-icon-lift {
-            transform: translateZ(50px);
-            transition: transform 0.4s ease;
-        }
-        .card-3d:hover .card-icon-lift {
-            transform: translateZ(70px) scale(1.1);
-        }
+        .card-content-lift { transform: translateZ(30px); transform-style: preserve-3d; }
+        .card-icon-lift { transform: translateZ(50px); transition: transform 0.4s ease; }
+        .card-3d:hover .card-icon-lift { transform: translateZ(70px) scale(1.1); }
 
-        /* ANIMACIONES Y ESTILOS DEL HERO LOGO */
+        /* HERO LOGO ANIMATION */
         .hero-logo-container {
-            width: 320px;
-            height: 320px;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: float-orb 6s ease-in-out infinite;
+            width: 320px; height: 320px; position: relative;
+            transform-style: preserve-3d; animation: float-orb 6s ease-in-out infinite;
         }
         @keyframes float-orb { 
             0%, 100% { transform: translateY(0); } 
             50% { transform: translateY(-20px); } 
         }
-        
         .hero-gradient-text {
             background: linear-gradient(to right, #84CC16, #fff, #A855F7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         
-        /* ESTILOS EXTRA UI */
+        /* UI HELPERS */
         .btn-modern {
             background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
             border: 1px solid rgba(255,255,255,0.1);
@@ -202,19 +135,15 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-modern:hover {
-            background: rgba(132, 204, 22, 0.2);
-            border-color: rgba(132, 204, 22, 0.5);
-            box-shadow: 0 0 20px rgba(132, 204, 22, 0.3);
-            transform: translateY(-2px);
+            background: rgba(132, 204, 22, 0.2); border-color: rgba(132, 204, 22, 0.5);
+            box-shadow: 0 0 20px rgba(132, 204, 22, 0.3); transform: translateY(-2px);
         }
         .btn-primary-glow {
-            background: #84CC16;
-            color: #0f172a;
+            background: #84CC16; color: #0f172a;
             box-shadow: 0 0 20px rgba(132, 204, 22, 0.4);
         }
         .btn-primary-glow:hover {
-            background: #a3e635;
-            box-shadow: 0 0 30px rgba(132, 204, 22, 0.6);
+            background: #a3e635; box-shadow: 0 0 30px rgba(132, 204, 22, 0.6);
         }
         .simple-wish-container {
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
@@ -227,7 +156,7 @@
 
     <div class="fixed inset-0 w-full h-full -z-50 pointer-events-none">
         <div class="absolute inset-0 bg-black">
-            <img src="manos_unidas_oscuro.png" alt="Fondo" class="w-full h-full object-cover opacity-20">
+            <img src="images/manos_unidas_oscuro.png" alt="Fondo" class="w-full h-full object-cover opacity-20">
         </div>
         <div class="absolute top-[-10%] left-[10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] opacity-30 animate-pulse"></div>
         <div class="absolute bottom-[-10%] right-[10%] w-[700px] h-[700px] bg-secondary/5 rounded-full blur-[120px] opacity-30 animate-pulse" style="animation-delay: 2s;"></div>
@@ -327,7 +256,7 @@
                             <div class="mt-12 relative flex justify-center perspective-500 card-content-lift">
                                 <div class="hero-logo-container">
                                     <div class="absolute inset-0 bg-primary/20 blur-[50px] rounded-full transform translate-z(-20px)"></div>
-                                    <img alt="Manos Unidas Logo" class="w-full h-full object-contain drop-shadow-2xl" src="manos_unidas_oscuro.png" />
+                                    <img alt="Manos Unidas Logo" class="w-full h-full object-contain drop-shadow-2xl" src="images/manos_unidas_oscuro.png" />
                                 </div>
                             </div>
 
@@ -368,7 +297,7 @@
                                 <span class="material-symbols-outlined text-4xl text-blue-400">sports_esports</span>
                             </div>
                             <div class="card-icon-lift w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500/20 to-blue-900/40 border border-blue-500/20 flex items-center justify-center mb-8 shadow-lg backdrop-blur-sm overflow-hidden">
-                                <img alt="Torneos" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform" src="football imagen.jpg"/>
+                                <img alt="Torneos" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform" src="images/football imagen.jpg"/>
                             </div>
                             <div class="card-content-lift">
                                 <h3 class="text-2xl font-bold text-white mb-4">Torneos</h3>
@@ -391,7 +320,7 @@
                                 <span class="material-symbols-outlined text-4xl text-green-400">hiking</span>
                             </div>
                             <div class="card-icon-lift w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500/20 to-green-900/40 border border-green-500/20 flex items-center justify-center mb-8 shadow-lg backdrop-blur-sm overflow-hidden">
-                                <img alt="Correcaminatas" class="w-full h-full object-cover transform group-hover:rotate-12 transition-transform" src="correcaminata recuadro derecho.png"/>
+                                <img alt="Correcaminatas" class="w-full h-full object-cover transform group-hover:rotate-12 transition-transform" src="images/correcaminata recuadro derecho.png"/>
                             </div>
                             <div class="card-content-lift">
                                 <h3 class="text-2xl font-bold text-white mb-4">Correcaminatas</h3>
@@ -417,7 +346,7 @@
                                 </span>
                             </div>
                             <div class="card-icon-lift w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/20 to-purple-900/40 border border-purple-500/20 flex items-center justify-center mb-8 shadow-lg backdrop-blur-sm overflow-hidden">
-                                <img alt="Podcast" class="w-full h-full object-cover transform group-hover:-translate-y-2 transition-transform" src="podcast fondo de pantalla.png"/>
+                                <img alt="Podcast" class="w-full h-full object-cover transform group-hover:-translate-y-2 transition-transform" src="images/podcast fondo de pantalla.png"/>
                             </div>
                             <div class="card-content-lift">
                                 <h3 class="text-2xl font-bold text-white mb-4">Podcast</h3>
@@ -440,7 +369,7 @@
                                 <span class="material-symbols-outlined text-4xl text-yellow-400">inventory_2</span>
                             </div>
                             <div class="card-icon-lift w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-yellow-900/40 border border-yellow-500/20 flex items-center justify-center mb-8 shadow-lg backdrop-blur-sm overflow-hidden">
-                                <img alt="Proyecto Materiales" class="w-full h-full object-cover transform group-hover:skew-y-3 transition-transform" src="útiles derecha.png"/>
+                                <img alt="Proyecto Materiales" class="w-full h-full object-cover transform group-hover:skew-y-3 transition-transform" src="images/útiles derecha.png"/>
                             </div>
                             <div class="card-content-lift">
                                 <h3 class="text-2xl font-bold text-white mb-4">Materiales</h3>
@@ -463,7 +392,7 @@
                                 <span class="material-symbols-outlined text-4xl text-pink-400">palette</span>
                             </div>
                             <div class="card-icon-lift w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-500/20 to-pink-900/40 border border-pink-500/20 flex items-center justify-center mb-8 shadow-lg backdrop-blur-sm overflow-hidden">
-                                <img alt="Pared Creativa" class="w-full h-full object-cover transform group-hover:rotate-6 transition-transform" src="pared creativa derecha.png"/>
+                                <img alt="Pared Creativa" class="w-full h-full object-cover transform group-hover:rotate-6 transition-transform" src="images/pared creativa derecha.png"/>
                             </div>
                             <div class="card-content-lift">
                                 <h3 class="text-2xl font-bold text-white mb-4">Pared Creativa</h3>
@@ -486,7 +415,7 @@
                                 <span class="material-symbols-outlined text-4xl text-cyan-400">extension</span>
                             </div>
                             <div class="card-icon-lift w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-cyan-900/40 border border-cyan-500/20 flex items-center justify-center mb-8 shadow-lg backdrop-blur-sm overflow-hidden">
-                                <img alt="ESENCIA" class="w-full h-full object-cover transform group-hover:scale-95 transition-transform" src="E.S.E.N.C.I.A izquierda.png"/>
+                                <img alt="ESENCIA" class="w-full h-full object-cover transform group-hover:scale-95 transition-transform" src="images/E.S.E.N.C.I.A izquierda.png"/>
                             </div>
                             <div class="card-content-lift">
                                 <h3 class="text-2xl font-bold text-white mb-4">ESENCIA</h3>
@@ -541,14 +470,13 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
         }
-
-        // Simulación básica de Auth para que los botones de la Navbar reaccionen si es necesario
-        // (Adaptado de tu código original, simplificado para UI)
         function updateUserMenu() {
-            // Aquí iría tu lógica real de auth.js
             console.log("Menú actualizado");
         }
     </script>
+    
+    <script src="js/auth.js"></script>
     <script src="js/sivia-widget.js"></script>
+
 </body>
 </html>

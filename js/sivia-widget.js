@@ -1,10 +1,8 @@
-(function() {
-    // ================= CONFIGURACIÓN EXACTA =================
-    
-    // 1. URL DEL BACKEND (Solo Sivia)
-    const URL_SIVIA_CHAT = "https://sivia-backend.onrender.com/chat";
+// Envolvemos todo en un evento para asegurar que el Body ya exista
+window.addEventListener('DOMContentLoaded', () => {
 
-    // 2. RUTA DE IMAGEN (Asegúrate de que exista en tu carpeta images/)
+    // ================= CONFIGURACIÓN EXACTA =================
+    const URL_SIVIA_CHAT = "https://sivia-backend.onrender.com/chat";
     const IMG_SIVIA = "images/sivia recuadro derecho.png"; 
 
     // ================= ESTILOS CSS =================
@@ -13,7 +11,6 @@
         @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-        /* Contenedor del Widget */
         #ai-widget-wrapper {
             font-family: 'Inter', sans-serif;
             position: fixed; bottom: 20px; right: 20px;
@@ -21,7 +18,6 @@
             align-items: flex-end; gap: 10px;
         }
 
-        /* Botón Flotante */
         #ai-fab-btn {
             width: 65px; height: 65px; border-radius: 50%;
             cursor: pointer; box-shadow: 0 4px 25px rgba(0,0,0,0.4);
@@ -31,7 +27,6 @@
         #ai-fab-btn:hover { transform: scale(1.1); }
         #ai-fab-btn img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Ventana de Chat */
         #ai-chat-window {
             position: fixed; bottom: 100px; right: 20px;
             width: 360px; height: 550px; max-height: 80vh;
@@ -41,7 +36,6 @@
             z-index: 999998; overflow: hidden;
         }
 
-        /* Cabecera */
         .chat-header {
             padding: 15px; background: rgba(30, 41, 59, 0.8);
             border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -51,7 +45,6 @@
         .header-logo { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.3); object-fit: cover; }
         .header-title { font-weight: 600; font-size: 16px; }
 
-        /* Mensajes */
         #chat-stream {
             flex: 1; padding: 15px; overflow-y: auto;
             display: flex; flex-direction: column; gap: 15px;
@@ -61,7 +54,6 @@
         .msg.user { background: #2563eb; align-self: flex-end; border-bottom-right-radius: 2px; }
         .msg.bot { background: #334155; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.1); }
         
-        /* Input */
         .input-zone {
             padding: 12px; background: rgba(15, 23, 42, 0.95);
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -125,7 +117,6 @@
             window.closeChat();
         } else {
             chatWindow.style.display = 'flex';
-            // Mensaje de bienvenida si el chat está vacío
             const stream = document.getElementById('chat-stream');
             if (stream.innerHTML.trim() === "") {
                 addMsg("Hola, soy Sivia. ¿En qué puedo ayudarte?", "bot");
@@ -140,13 +131,13 @@
     function addMsg(content, sender) {
         const stream = document.getElementById('chat-stream');
         const msgDiv = document.createElement('div');
-        msgDiv.className = \`msg \${sender}\`;
+        msgDiv.className = `msg ${sender}`;
 
         if (content.includes('<') && content.includes('>')) {
             msgDiv.innerHTML = content;
         } else {
-            let formatted = content.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')
-                                   .replace(/(https?:\\/\\/[^\\s]+)/g, '<a href="$1" style="color:#38bdf8" target="_blank">$1</a>');
+            let formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                   .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color:#38bdf8" target="_blank">$1</a>');
             msgDiv.innerHTML = formatted;
         }
 
@@ -171,7 +162,7 @@
             const response = await fetch(URL_SIVIA_CHAT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: text }) // Solo enviamos texto
+                body: JSON.stringify({ question: text }) 
             });
             
             const data = await response.json();
@@ -180,7 +171,7 @@
 
         } catch (error) {
             loader.style.display = 'none';
-            addMsg("⚠️ Error de conexión con el servidor. Revisa la consola (F12).", 'bot');
+            addMsg("⚠️ Error de conexión con el servidor.", 'bot');
             console.error("ERROR DETALLADO:", error);
         }
     };
@@ -189,4 +180,4 @@
         if (e.key === 'Enter') window.handleSend();
     });
 
-})();
+});

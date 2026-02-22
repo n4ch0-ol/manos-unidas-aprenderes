@@ -1,19 +1,11 @@
 (function() {
     // ================= CONFIGURACIÓN EXACTA =================
     
-    // 1. URLs DE LOS BACKENDS
+    // 1. URL DEL BACKEND (Solo Sivia)
     const URL_SIVIA_CHAT = "https://sivia-backend.onrender.com/chat";
-    const URL_VISTA_BASE = "https://sivia-backend-1.onrender.com"; 
-    // Nota: El servidor de Vista (Creaty) escucha en /generate
 
-    // 2. RUTAS DE IMÁGENES (Asegúrate de que existan en tu carpeta images/)
+    // 2. RUTA DE IMAGEN (Asegúrate de que exista en tu carpeta images/)
     const IMG_SIVIA = "images/sivia recuadro derecho.png"; 
-    const IMG_VISTA = "images/vista_logo.png";             
-
-    // VARIABLES DE ESTADO
-    let currentMode = 'sivia'; // Por defecto
-    let imageBase64 = null;    // Para subidas de imagen
-    let thinkInterval;
 
     // ================= ESTILOS CSS =================
     const style = document.createElement('style');
@@ -39,24 +31,6 @@
         #ai-fab-btn:hover { transform: scale(1.1); }
         #ai-fab-btn img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Menú Desplegable */
-        #ai-selector-menu {
-            display: flex; flex-direction: column; gap: 8px;
-            margin-bottom: 5px; opacity: 0; visibility: hidden;
-            transform: translateY(20px); transition: all 0.3s;
-        }
-        #ai-selector-menu.active { opacity: 1; visibility: visible; transform: translateY(0); }
-
-        .ai-option {
-            background: rgba(15, 23, 42, 0.95); color: white;
-            border: 1px solid rgba(255,255,255,0.2); padding: 10px 15px;
-            border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600;
-            display: flex; align-items: center; justify-content: flex-end; gap: 10px;
-            backdrop-filter: blur(5px); transition: 0.2s;
-        }
-        .ai-option:hover { background: #334155; transform: translateX(-5px); }
-        .ai-option img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
-
         /* Ventana de Chat */
         #ai-chat-window {
             position: fixed; bottom: 100px; right: 20px;
@@ -66,7 +40,6 @@
             flex-direction: column; border: 1px solid rgba(255,255,255,0.15);
             z-index: 999998; overflow: hidden;
         }
-        #ai-chat-window.open { display: flex; }
 
         /* Cabecera */
         .chat-header {
@@ -88,9 +61,6 @@
         .msg.user { background: #2563eb; align-self: flex-end; border-bottom-right-radius: 2px; }
         .msg.bot { background: #334155; align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(255,255,255,0.1); }
         
-        /* Imágenes dentro del chat */
-        .msg img { max-width: 100%; border-radius: 8px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.2); }
-
         /* Input */
         .input-zone {
             padding: 12px; background: rgba(15, 23, 42, 0.95);
@@ -106,7 +76,6 @@
             padding: 6px; border-radius: 50%; transition: 0.2s; display: flex;
         }
         .action-btn:hover { color: #38bdf8; background: rgba(255,255,255,0.1); }
-        .action-btn.has-file { color: #4ade80; }
 
         #thinking-indicator {
             padding: 0 15px 10px 15px; font-size: 11px; color: #94a3b8; font-style: italic; display: none;
@@ -117,14 +86,6 @@
     // ================= HTML DEL WIDGET =================
     const widgetHTML = `
         <div id="ai-widget-wrapper">
-            <div id="ai-selector-menu">
-                <div class="ai-option" onclick="window.selectAI('sivia')">
-                    Sivia AI <img src="${IMG_SIVIA}" alt="S">
-                </div>
-                <div class="ai-option" onclick="window.selectAI('vista')">
-                    Vista Engine <img src="${IMG_VISTA}" alt="V">
-                </div>
-            </div>
             <div id="ai-fab-btn" onclick="window.toggleWidget()">
                 <img src="${IMG_SIVIA}" alt="Chat">
             </div>
@@ -133,8 +94,8 @@
         <div id="ai-chat-window">
             <div class="chat-header">
                 <div class="header-info">
-                    <img id="chat-header-img" class="header-logo" src="${IMG_SIVIA}">
-                    <span id="chat-header-title" class="header-title">SIVIA Chat</span>
+                    <img class="header-logo" src="${IMG_SIVIA}">
+                    <span class="header-title">SIVIA Chat</span>
                 </div>
                 <span class="material-icons-round action-btn" onclick="window.closeChat()">close</span>
             </div>
@@ -144,13 +105,7 @@
             <div id="thinking-indicator">Procesando...</div>
 
             <div class="input-zone">
-                <label for="file-upload-input" class="action-btn" id="clip-btn">
-                    <span class="material-icons-round">attach_file</span>
-                </label>
-                <input type="file" id="file-upload-input" accept="image/*" style="display:none">
-
                 <input type="text" id="chat-input" placeholder="Escribe un mensaje..." autocomplete="off">
-                
                 <button class="action-btn" onclick="window.handleSend()">
                     <span class="material-icons-round">send</span>
                 </button>
@@ -169,129 +124,59 @@
         if (chatWindow.style.display === 'flex') {
             window.closeChat();
         } else {
-            document.getElementById('ai-selector-menu').classList.toggle('active');
+            chatWindow.style.display = 'flex';
+            // Mensaje de bienvenida si el chat está vacío
+            const stream = document.getElementById('chat-stream');
+            if (stream.innerHTML.trim() === "") {
+                addMsg("Hola, soy Sivia. ¿En qué puedo ayudarte?", "bot");
+            }
         }
     };
 
     window.closeChat = function() {
         document.getElementById('ai-chat-window').style.display = 'none';
-        document.getElementById('ai-selector-menu').classList.remove('active');
-    };
-
-    window.selectAI = function(ai) {
-        currentMode = ai;
-        const chatWindow = document.getElementById('ai-chat-window');
-        const headerImg = document.getElementById('chat-header-img');
-        const headerTitle = document.getElementById('chat-header-title');
-        const stream = document.getElementById('chat-stream');
-
-        if (ai === 'sivia') {
-            headerImg.src = IMG_SIVIA;
-            headerTitle.innerText = "SIVIA Chat";
-            if (stream.innerHTML.trim() === "") addMsg("Hola, soy Sivia. ¿En qué puedo ayudarte?", "bot");
-        } else {
-            headerImg.src = IMG_VISTA;
-            headerTitle.innerText = "Vista Engine";
-            if (stream.innerHTML.trim() === "") addMsg("Soy Vista. Escribe lo que quieras ver y lo crearé.", "bot");
-        }
-
-        document.getElementById('ai-selector-menu').classList.remove('active');
-        chatWindow.style.display = 'flex';
     };
 
     function addMsg(content, sender) {
         const stream = document.getElementById('chat-stream');
         const msgDiv = document.createElement('div');
-        msgDiv.className = `msg ${sender}`;
+        msgDiv.className = \`msg \${sender}\`;
 
         if (content.includes('<') && content.includes('>')) {
             msgDiv.innerHTML = content;
         } else {
-            let formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                   .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" style="color:#38bdf8" target="_blank">$1</a>');
+            let formatted = content.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')
+                                   .replace(/(https?:\\/\\/[^\\s]+)/g, '<a href="$1" style="color:#38bdf8" target="_blank">$1</a>');
             msgDiv.innerHTML = formatted;
-        }
-
-        if (sender === 'user' && imageBase64) {
-            const img = document.createElement('img');
-            img.src = "data:image/jpeg;base64," + imageBase64;
-            msgDiv.appendChild(img);
         }
 
         stream.appendChild(msgDiv);
         stream.scrollTop = stream.scrollHeight;
     }
 
-    document.getElementById('file-upload-input').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                imageBase64 = evt.target.result.split(',')[1];
-                document.getElementById('clip-btn').classList.add('has-file');
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // ================= FUNCIÓN DE ENVÍO CORREGIDA =================
+    // ================= FUNCIÓN DE ENVÍO =================
     window.handleSend = async function() {
         const input = document.getElementById('chat-input');
         const text = input.value.trim();
 
-        if (!text && !imageBase64) return;
+        if (!text) return;
 
         addMsg(text, 'user');
         input.value = '';
-        
-        const imgToSend = imageBase64;
-        imageBase64 = null;
-        document.getElementById('clip-btn').classList.remove('has-file');
-        document.getElementById('file-upload-input').value = '';
 
         const loader = document.getElementById('thinking-indicator');
         loader.style.display = 'block';
 
         try {
-            // ==================== MODO SIVIA (CHAT) ====================
-            if (currentMode === 'sivia') {
-                const response = await fetch(URL_SIVIA_CHAT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question: text, image: imgToSend })
-                });
-                const data = await response.json();
-                loader.style.display = 'none';
-                addMsg(data.answer || "No entendí eso.", 'bot');
-            } 
+            const response = await fetch(URL_SIVIA_CHAT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: text }) // Solo enviamos texto
+            });
             
-            // ==================== MODO VISTA (IMAGENES) ====================
-            else if (currentMode === 'vista') {
-                // NOTA: Vista (backend 1) NO tiene chat, solo /generate
-                // Forzamos siempre la generación de imagen
-                
-                const response = await fetch(URL_VISTA_BASE + '/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: text })
-                });
-                
-                const data = await response.json();
-                loader.style.display = 'none';
-                
-                // Procesamos la respuesta del backend
-                if (data.image) {
-                    // Si llega imagen en base64, creamos el HTML para mostrarla
-                    const imgHTML = `
-                        <div>Aquí tienes tu creación: "${text}"</div>
-                        <img src="data:image/png;base64,${data.image}" alt="Arte Generado">
-                        <div style="font-size:10px; opacity:0.7; margin-top:5px;">Generado con Imagen 3</div>
-                    `;
-                    addMsg(imgHTML, 'bot');
-                } else {
-                    addMsg("❌ Error: " + (data.error || "No se pudo generar."), 'bot');
-                }
-            }
+            const data = await response.json();
+            loader.style.display = 'none';
+            addMsg(data.answer || "No entendí eso.", 'bot');
 
         } catch (error) {
             loader.style.display = 'none';

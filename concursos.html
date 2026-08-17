@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="css/styles.css">
     <style>
         body {
-            background-image: url('images/manos_unidas_oscuro.png'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat;
+            background-image: url('images/manos_unidas_oscuro.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            background-repeat: no-repeat;
             transition: background-image 0.5s ease-in-out;
         }
 
@@ -63,14 +64,40 @@
             transform: scale(1.05);
         }
 
+        /* Animaciones parpadeantes para botones con inscripción activa */
+        @keyframes pulse-truco {
+            0% {
+                box-shadow: 0 0 5px #C0A060, 0 0 10px #C0A060;
+            }
+            50% {
+                box-shadow: 0 0 20px #ffea79, 0 0 35px #C0A060;
+            }
+            100% {
+                box-shadow: 0 0 5px #C0A060, 0 0 10px #C0A060;
+            }
+        }
+
+        @keyframes pulse-minecraft {
+            0% {
+                box-shadow: 0 0 5px #6A994E, 0 0 10px #6A994E;
+            }
+            50% {
+                box-shadow: 0 0 20px #a7f374, 0 0 35px #6A994E;
+            }
+            100% {
+                box-shadow: 0 0 5px #6A994E, 0 0 10px #6A994E;
+            }
+        }
+
         /* Botones temáticos */
         #btn-truco {
             background-color: #8B0000;
             border: 2px solid #C0A060;
+            animation: pulse-truco 1.8s infinite ease-in-out;
         }
 
         #btn-truco:hover {
-            box-shadow: 0 0 15px #C0A060;
+            box-shadow: 0 0 25px #C0A060;
         }
 
         #btn-valorant {
@@ -85,10 +112,11 @@
         #btn-minecraft {
             background-color: #6A994E;
             border: 2px solid #582F0E;
+            animation: pulse-minecraft 1.8s infinite ease-in-out;
         }
 
         #btn-minecraft:hover {
-            box-shadow: 0 0 15px #6A994E;
+            box-shadow: 0 0 25px #6A994E;
         }
 
         #btn-football {
@@ -149,6 +177,43 @@
             color: #f0f0f0;
         }
 
+        /* Estilo para los botones de inscripción dentro de las cards */
+        .btn-inscribirse {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-inscribirse-truco {
+            background-color: #8B0000;
+            border: 2px solid #C0A060;
+        }
+
+        .btn-inscribirse-truco:hover {
+            background-color: #a80000;
+            box-shadow: 0 0 20px #C0A060;
+            transform: translateY(-3px);
+        }
+
+        .btn-inscribirse-minecraft {
+            background-color: #6A994E;
+            border: 2px solid #386641;
+        }
+
+        .btn-inscribirse-minecraft:hover {
+            background-color: #7bb25b;
+            box-shadow: 0 0 20px #a7f374;
+            transform: translateY(-3px);
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -173,6 +238,12 @@
 
             .torneo-card {
                 padding: 1.5rem;
+            }
+
+            .btn-inscribirse {
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
             }
         }
     </style>
@@ -201,6 +272,7 @@
                     Queremos fomentar un espacio de camaradería y astucia con este clásico infaltable. 
                     Aún no sabemos dónde se va a realizar el concurso, pero estamos buscando el lugar ideal.
                 </p>
+                <a href="https://forms.gle/4XXDYVMqAHqUnja6A" target="_blank" rel="noopener noreferrer" class="btn-inscribirse btn-inscribirse-truco">Inscribirse</a>
             </div>
 
             <!-- VALORANT -->
@@ -223,6 +295,7 @@
                     La idea es crear un servidor exclusivo donde los participantes se enfrentarán en diversos 
                     concursos de construcción para demostrar su creatividad.
                 </p>
+                <a href="https://forms.gle/76fcghspKY6W7F4FA" target="_blank" rel="noopener noreferrer" class="btn-inscribirse btn-inscribirse-minecraft">Inscribirse</a>
             </div>
 
             <!-- FÚTBOL -->

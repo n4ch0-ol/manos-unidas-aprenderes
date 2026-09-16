@@ -12,123 +12,111 @@
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
         }
 
         .forms-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 2rem;
-            margin: 2rem 0;
+            margin-top: 2.5rem;
         }
 
         .form-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 20px;
-            padding: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.18);
             text-align: center;
-            transition: all 0.3s;
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
         }
 
         .form-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-8px);
             background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
         }
 
         .form-card h3 {
-            color: white;
-            margin-bottom: 1rem;
+            color: #ffffff;
+            margin: 0.5rem 0 0.75rem 0;
+            font-size: 1.5rem;
+            font-weight: 600;
         }
 
         .form-card p {
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            flex-grow: 1;
         }
 
         .form-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            justify-content: center;
+            font-size: 3.2rem;
+            margin-bottom: 0.8rem;
+            display: flex;
             align-items: center;
-            z-index: 10000;
+            justify-content: center;
+            height: 60px;
+            transition: transform 0.3s ease;
         }
 
-        .modal.active {
-            display: flex;
+        .form-card:hover .form-icon {
+            transform: scale(1.1);
         }
 
-        .modal-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            position: relative;
+        .sivia-img {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 2rem;
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.25s ease;
             cursor: pointer;
+            border: none;
         }
 
-        .modal-content h2 {
-            color: white;
-            margin-bottom: 1.5rem;
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
         }
 
-        .modal-content form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+            transform: translateY(-2px);
         }
 
-        .modal-content input,
-        .modal-content textarea {
-            padding: 0.8rem;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-family: inherit;
-        }
-
-        .modal-content input::placeholder,
-        .modal-content textarea::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .modal-content textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .success-modal {
-            text-align: center;
-        }
-
-        .success-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+        .btn-primary:active {
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -142,93 +130,61 @@
     </nav>
 
     <div class="container">
-        <h1 class="text-center" style="color: white; margin: 2rem 0;">📝 Formularios</h1>
-        <p class="text-center" style="color: rgba(255,255,255,0.8); margin-bottom: 3rem;">Tu voz importa. Envía tus propuestas, sugerencias y feedback</p>
+        <h1 class="text-center" style="color: white; margin: 2rem 0 0.5rem 0; text-align: center;">📝 Formularios</h1>
+        <p class="text-center" style="color: rgba(255,255,255,0.8); margin-bottom: 3rem; text-align: center;">Tu voz importa. Envía tus propuestas, sugerencias y feedback.</p>
 
-        
-
-            <div class="form-card">
-                <div class="form-icon">✏️</div>
-                <h3>Sugerencias</h3>
-                <p>Ayúdanos a mejorar con tus comentarios y sugerencias</p>
-                <button class="btn btn-primary" onclick="abrirForm('sugerencia')">Completar Formulario</button>
-            </div>
-
-            <div class="form-card">
-                <div class="form-icon">⚠️</div>
-                <h3>Reportar Problema</h3>
-                <p>¿Encontraste algo que no funciona? Repórtalo aquí</p>
-                <button class="btn btn-primary" onclick="abrirForm('problema')">Completar Formulario</button>
-            </div>
-
+        <div class="forms-grid">
             
-
+            <!-- Sugerencias -->
             <div class="form-card">
-                <div class="form-icon"><img src="images/sivia recuadro derecho.png" style="width:48px;height:48px;border-radius:50%;"></div>
-                <h3>Feedback SIVIA</h3>
-                <p>Ayuda a mejorar nuestra IA con tu experiencia</p>
-                <button class="btn btn-primary" onclick="abrirForm('sivia')">Completar Formulario</button>
+                <div>
+                    <div class="form-icon">✏️</div>
+                    <h3>Sugerencias</h3>
+                    <p>Ayúdanos a mejorar con tus comentarios y sugerencias para el centro de estudiantes.</p>
+                </div>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSctDHAcy-Iv77xo9CB-3yNhKTgyoaMXyhOs1Wtk3XKwetIYlA/viewform?usp=dialog" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="btn btn-primary">
+                   Completar Formulario
+                </a>
             </div>
 
-            
+            <!-- Reportar Problema -->
+            <div class="form-card">
+                <div>
+                    <div class="form-icon">⚠️</div>
+                    <h3>Reportar Problema</h3>
+                    <p>¿Encontraste algo que no funciona o tenés algún inconveniente? Repórtalo aquí.</p>
+                </div>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdI07o5N7luXzWJu_WLA8dClxAGHCMLw60qK0qVvRO25xTMkg/viewform?usp=publish-editor" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="btn btn-primary">
+                   Completar Formulario
+                </a>
+            </div>
+
+            <!-- Feedback SIVIA -->
+            <div class="form-card">
+                <div>
+                    <div class="form-icon">
+                        <img src="images/sivia recuadro derecho.png" alt="SIVIA" class="sivia-img">
+                    </div>
+                    <h3>Feedback SIVIA</h3>
+                    <p>Ayuda a mejorar nuestra IA compartiendo tu experiencia de uso.</p>
+                </div>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfBGTkeupjmFFyDwqe_i1_d6zDfqWouUqgIw1hwmp9Tb4slnQ/viewform?usp=dialog" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="btn btn-primary">
+                   Completar Formulario
+                </a>
+            </div>
+
         </div>
     </div>
 
-    <!-- Modal Formulario -->
-    <div class="modal" id="formModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="cerrarForm()">×</button>
-            <h2 id="formTitle">Formulario</h2>
-            <form id="dynamicForm" onsubmit="enviarForm(event)">
-                <input type="text" placeholder="Tu nombre" required>
-                <input type="email" placeholder="Tu email" required>
-                <textarea placeholder="Tu mensaje" required></textarea>
-                <button type="submit" class="btn btn-primary">Enviar</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Éxito -->
-    <div class="modal" id="successModal">
-        <div class="modal-content success-modal">
-            <div class="success-icon">✓</div>
-            <h2>¡Formulario Enviado!</h2>
-            <p style="color: rgba(255,255,255,0.8);">Gracias por tu participación. Revisaremos tu mensaje pronto.</p>
-            <button class="btn btn-primary" onclick="cerrarSuccess()">Cerrar</button>
-        </div>
-    </div>
-
-    <script>
-        const titulos = {
-            propuesta: 'Propuesta de Proyecto',
-            sugerencia: 'Sugerencias',
-            problema: 'Reportar Problema',
-            torneo: 'Inscripción a Torneos',
-            sivia: 'Feedback SIVIA',
-            contacto: 'Contacto CE'
-        };
-
-        function abrirForm(tipo) {
-            document.getElementById('formTitle').textContent = titulos[tipo];
-            document.getElementById('formModal').classList.add('active');
-        }
-
-        function cerrarForm() {
-            document.getElementById('formModal').classList.remove('active');
-        }
-
-        function cerrarSuccess() {
-            document.getElementById('successModal').classList.remove('active');
-        }
-
-        function enviarForm(e) {
-            e.preventDefault();
-            cerrarForm();
-            document.getElementById('successModal').classList.add('active');
-            document.getElementById('dynamicForm').reset();
-        }
-    </script>
-    
     <script src="js/sivia-widget.js"></script>
 </body>
 </html>

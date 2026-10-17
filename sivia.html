@@ -3,281 +3,430 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIVIA - Chat Inteligente</title>
+    <title>SIVIA | Colegio Aprenderes 2026</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <meta property="og:image" content="https://-ol.github.io/manos-unidas-aprenderes/images/sivia recuadro derecho.png"/>
-    
-    <link rel="icon" type="image/png" href="images/sivia recuadro derecho.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <meta property="og:image" content="https://n4ch0-ol.github.io/manos-unidas-aprenderes/images/sivia recuadro derecho.png"/>
+    <link rel="icon" type="image/png" href="images/sivia recuadro derecho.png">
     <link rel="apple-touch-icon" href="images/sivia recuadro derecho.png">
 
-    <!-- SEO para Google -->
-    <title>SIVIA | Colegio Aprenderes 2026</title>
     <meta name="description" content="SIVIA, IA del centro de estudiantes y el colegio Aprenderes, con gemini 3, búsqueda confiable y más."/>
     <meta name="keywords" content="Manos Unidas, Aprenderes, centro de estudiantes, colegio Aprenderes, SIVIA, Sivia IA, sivia, ia, sivia, Sivia"/>
     <meta name="robots" content="index, follow"/>
     <link rel="canonical" href="https://n4ch0-ol.github.io/manos-unidas-aprenderes/sivia.html"/>
 
-    <!-- Open Graph (imagen al compartir en WhatsApp/redes) -->
     <meta property="og:title" content="SIVIA | Colegio Aprenderes"/>
     <meta property="og:description" content="La IA del colegio Aprenderes, con gemini 3 flash, búsqueda confiable y más."/>
     <meta property="og:type" content="website"/>
     <meta property="og:url" content="https://n4ch0-ol.github.io/manos-unidas-aprenderes/sivia.html"/>
-    
+
     <style>
-        /* --- ESTILOS GENERALES --- */
         :root {
-            --bg-overlay: rgba(15, 23, 42, 0.85); /* Capa oscura sobre la imagen de fondo */
-            --bg-panel: rgba(30, 41, 59, 0.7);   /* Paneles semitransparentes */
-            --accent: #38bdf8; /* Azul SIVIA */
+            --bg-overlay: rgba(15, 23, 42, 0.85);
+            --bg-panel: rgba(30, 41, 59, 0.55);
+            --accent: #38bdf8;
+            --accent-2: #a855f7;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --user-bubble: #2563eb;
+            --border-soft: rgba(255,255,255,0.08);
+            --border-active: rgba(56, 189, 248, 0.4);
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            margin: 0;
-            padding: 0;
             font-family: 'Inter', sans-serif;
             color: var(--text-main);
             height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-
-            /* --- CONFIGURACIÓN DEL FONDO --- */
-            background-image: url('images/manos_unidas_oscuro.png'); /* TU IMAGEN DE FONDO */
+            background-image: url('images/manos_unidas_oscuro.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: #0f172a; /* Color de respaldo */
+            background-color: #0f172a;
         }
 
-        /* Capa oscura para mejorar la lectura sobre la imagen de fondo */
         body::before {
             content: '';
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: var(--bg-overlay);
-            z-index: -1;
-            backdrop-filter: blur(3px); /* Opcional: un ligero desenfoque al fondo */
+            z-index: 0;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
-        /* --- CABECERA --- */
+        /* --- HEADER --- */
         header {
-            height: 70px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            z-index: 2;
+            height: 64px;
+            border-bottom: 1px solid var(--border-soft);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
-            background: rgba(15, 23, 42, 0.6); /* Cabecera semitransparente */
-            backdrop-filter: blur(10px);
+            padding: 0 24px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
         }
 
         .brand-area {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .brand-logo {
-            height: 40px;
-            width: 40px;
+            height: 38px;
+            width: 38px;
             object-fit: cover;
             border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
         }
 
         .brand-text {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             background: linear-gradient(90deg, #fff, #94a3b8);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* --- ÁREA DE CHAT (Centro) --- */
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.25);
+            border-radius: 20px;
+            font-size: 11px;
+            color: #4ade80;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pill::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px #4ade80;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        /* --- CHAT AREA --- */
         .chat-container {
+            position: relative;
+            z-index: 1;
             flex: 1;
             overflow-y: auto;
-            padding: 40px 20px;
+            padding: 32px 20px 24px;
             display: flex;
             flex-direction: column;
-            gap: 25px;
-            max-width: 900px;
+            gap: 20px;
+            max-width: 880px;
             width: 100%;
             margin: 0 auto;
             scrollbar-width: thin;
-            scrollbar-color: var(--bg-panel) transparent;
+            scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
         }
 
-        /* Mensajes */
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-track { background: transparent; }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 3px;
+        }
+
+        /* --- MESSAGES --- */
         .message {
             display: flex;
-            gap: 15px;
-            animation: fadeIn 0.3s ease;
-            line-height: 1.6;
+            gap: 12px;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            line-height: 1.55;
         }
 
         .avatar {
-            width: 35px; height: 35px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            overflow: hidden; /* Para recortar la imagen */
+            overflow: hidden;
         }
-        /* Estilo para el contenedor del logo del bot */
-        .avatar.bot { 
-            background: transparent; /* Fondo transparente para la imagen */
-            border: 1px solid rgba(255,255,255,0.1); 
-        }
-        .avatar.user { background: var(--user-bubble); color: white; }
 
-        /* Estilo de la imagen dentro del avatar */
+        .avatar.bot {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .avatar.user {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+        }
+
         .avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
+        .avatar .material-icons-round {
+            font-size: 20px;
+        }
+
         .content {
             flex: 1;
-            max-width: 100%;
+            min-width: 0;
         }
 
         .user-name {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             font-weight: 600;
+            letter-spacing: 0.3px;
         }
 
         .text-bubble {
-            font-size: 16px;
+            font-size: 15px;
             color: #e2e8f0;
-            background: var(--bg-panel); /* Fondo semitransparente para el texto */
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        /* Markdown básico */
-        .text-bubble strong { color: var(--accent); }
-        .text-bubble a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted; }
-        .text-bubble img { 
+            background: var(--bg-panel);
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border-soft);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: inline-block;
             max-width: 100%;
-            border-radius: 12px; 
-            margin-top: 10px; 
+            word-wrap: break-word;
+        }
+
+        .message.user .text-bubble {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.85), rgba(30, 64, 175, 0.85));
+            border-color: rgba(96, 165, 250, 0.3);
+            color: white;
+        }
+
+        .text-bubble strong { color: var(--accent); font-weight: 600; }
+        .text-bubble a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px dotted;
+            transition: color 0.2s;
+        }
+        .text-bubble a:hover { color: #7dd3fc; }
+        .text-bubble img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
             border: 1px solid rgba(255,255,255,0.2);
             display: block;
         }
 
-        /* --- ANIMACIÓN "PENSANDO" (GEMINI STYLE) --- */
+        /* --- THINKING ORBS (esfera 3D de puntos) --- */
         .thinking-wrapper {
-            display: none; /* Oculto por defecto */
+            display: none;
             align-items: center;
-            gap: 12px;
-            margin-left: 50px; /* Alineado con el texto del bot */
-            margin-bottom: 20px;
+            gap: 18px;
+            margin-left: 46px;
+            margin-bottom: 8px;
             padding: 10px 0;
         }
         .thinking-wrapper.active { display: flex; }
 
-        .spinner {
-            width: 18px; height: 18px;
-            border: 2px solid transparent;
-            border-top-color: var(--accent);
-            border-right-color: #a855f7;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .orb-scene {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            position: relative;
         }
 
-        .thinking-text {
-            font-size: 14px;
+        .orb-scene svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .orb-scene .link {
+            stroke: rgba(56, 189, 248, 0.35);
+            stroke-width: 0.4;
+            fill: none;
+        }
+
+        .orb-scene .link.alt {
+            stroke: rgba(168, 85, 247, 0.3);
+        }
+
+        .orb-scene .node {
+            fill: #7dd3fc;
+            filter: drop-shadow(0 0 2px rgba(56, 189, 248, 0.9));
+        }
+
+        .orb-scene .node.alt {
+            fill: #d8b4fe;
+            filter: drop-shadow(0 0 2px rgba(168, 85, 247, 0.9));
+        }
+
+        .orb-scene .core {
+            fill: url(#coreGrad);
+            opacity: 0.5;
+        }
+
+        .thinking-label {
+            font-size: 13px;
             color: var(--text-muted);
             font-style: italic;
-            animation: pulse 1.5s infinite;
+            letter-spacing: 0.4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        /* --- ÁREA DE INPUT (Abajo) --- */
+        .thinking-label .dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        /* (animación de esfera 3D ahora gestionada por JS + SVG) */
+
+        @keyframes dots {
+            0%   { content: ''; }
+            25%  { content: '.'; }
+            50%  { content: '..'; }
+            75%  { content: '...'; }
+            100% { content: ''; }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%      { opacity: 0.4; }
+        }
+
+        /* --- INPUT AREA --- */
         .input-wrapper {
-            padding: 20px;
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+            padding: 14px 20px 18px;
+            background: rgba(15, 23, 42, 0.78);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-top: 1px solid var(--border-soft);
         }
 
         .input-box {
-            max-width: 900px;
+            max-width: 880px;
             margin: 0 auto;
-            background: var(--bg-panel);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-            padding: 10px 15px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border-soft);
+            border-radius: 18px;
+            padding: 8px 8px 8px 14px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            transition: border-color 0.2s;
+            gap: 8px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+            transition: all 0.2s ease;
         }
-        .input-box:focus-within { border-color: var(--accent); }
+        .input-box:focus-within {
+            border-color: var(--border-active);
+            box-shadow: 0 4px 28px rgba(56, 189, 248, 0.15);
+        }
 
-        /* Clip de archivo */
         #file-upload { display: none; }
-        .attach-btn {
+
+        .attach-btn, .send-btn {
             color: var(--text-muted);
             cursor: pointer;
             padding: 8px;
-            border-radius: 50%;
+            border-radius: 12px;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: transparent;
+            border: none;
         }
-        .attach-btn:hover { background: rgba(255,255,255,0.1); color: white; }
-        .attach-btn.has-file { color: #4ade80; background: rgba(74, 222, 128, 0.1); }
+        .attach-btn:hover {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent);
+        }
+        .attach-btn.has-file {
+            color: #4ade80;
+            background: rgba(74, 222, 128, 0.12);
+        }
 
-        /* Campo de texto */
+        .send-btn {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(168, 85, 247, 0.18));
+            color: var(--accent);
+        }
+        .send-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(168, 85, 247, 0.3));
+        }
+        .send-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            transform: none;
+        }
+
         .main-input {
             flex: 1;
             background: transparent;
             border: none;
             color: white;
-            font-size: 16px;
+            font-size: 15px;
             font-family: inherit;
             outline: none;
-            padding: 10px 0;
+            padding: 10px 4px;
         }
+        .main-input::placeholder { color: rgba(148, 163, 184, 0.6); }
 
-        /* Botón Enviar */
-        .send-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .send-btn:hover { color: var(--accent); transform: scale(1.1); }
-        .send-btn:disabled { opacity: 0.5; cursor: default; }
-
-        /* Footer pequeño */
         .footer-note {
             text-align: center;
-            font-size: 11px;
-            color: #94a3b8;
-            margin-top: 10px;
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
         }
 
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 50% { opacity: 0.5; } }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
+        /* --- RESPONSIVE --- */
+        @media (max-width: 640px) {
+            header { padding: 0 16px; height: 56px; }
+            .brand-text { font-size: 16px; }
+            .status-pill { font-size: 10px; padding: 3px 8px; }
+            .chat-container { padding: 20px 14px; gap: 16px; }
+            .input-wrapper { padding: 12px 14px 14px; }
+            .text-bubble { font-size: 14px; padding: 10px 14px; }
+            .thinking-wrapper { margin-left: 44px; gap: 14px; }
+            .orb-scene { width: 48px; height: 48px; }
+        }
+
+        /* Preferencia de movimiento reducido (accesibilidad) */
+        @media (prefers-reduced-motion: reduce) {
+            .orb-sphere, .orb, .orb-sphere::before, .status-pill::before {
+                animation: none;
+            }
+            .orb { opacity: 0.8; }
+        }
     </style>
 </head>
 <body>
@@ -285,34 +434,33 @@
     <header>
         <div class="brand-area">
             <img src="images/sivia recuadro derecho.png" alt="SIVIA" class="brand-logo" onerror="this.style.display='none'">
-            <span class="brand-text">SIVIA Chat</span>
+            <span class="brand-text">SIVIA</span>
         </div>
+        <div class="status-pill">EN LÍNEA</div>
     </header>
 
     <div class="chat-container" id="chat-stream">
-        
-        <div class="message">
-            <div class="avatar bot">
-                <img src="images/sivia recuadro derecho.png" alt="SIVIA">
-            </div>
-            <div class="content">
-                <div class="user-name">SIVIA AI</div>
-                <div class="text-bubble">
-                    ¡Hola! Soy tu asistente virtual inteligente. 👋<br><br>
-                    Puedo:<br>
-                    🌍 <strong>Buscar en internet</strong> información actualizada.<br>
-                    📊 <strong>Consultar la base de datos</strong> interna.<br>
-                    👁️ <strong>Analizar imágenes</strong> que me envíes.<br><br>
-                    ¿En qué te ayudo hoy?
-                </div>
-            </div>
-        </div>
+
+        <!-- El chat arranca vacío. SIVIA responde cuando el usuario envía el primer mensaje. -->
 
     </div>
 
     <div class="thinking-wrapper" id="thinking-indicator">
-        <div class="spinner"></div>
-        <div class="thinking-text" id="thinking-status">Analizando...</div>
+        <div class="orb-scene">
+            <svg id="orb-svg" viewBox="-28 -28 56 56" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <radialGradient id="coreGrad">
+                        <stop offset="0%" stop-color="rgba(56,189,248,0.55)"/>
+                        <stop offset="70%" stop-color="rgba(56,189,248,0.08)"/>
+                        <stop offset="100%" stop-color="rgba(56,189,248,0)"/>
+                    </radialGradient>
+                </defs>
+                <circle class="core" cx="0" cy="0" r="12"/>
+                <g id="orb-links"></g>
+                <g id="orb-nodes"></g>
+            </svg>
+        </div>
+        <div class="thinking-label">Pensando<span class="dots"></span></div>
     </div>
 
     <div class="input-wrapper">
@@ -324,7 +472,7 @@
 
             <input type="text" class="main-input" id="user-input" placeholder="Escribe un mensaje a SIVIA..." autocomplete="off">
 
-            <button class="send-btn" id="send-btn" onclick="handleSend()">
+            <button class="send-btn" id="send-btn" onclick="handleSend()" title="Enviar">
                 <span class="material-icons-round">send</span>
             </button>
         </div>
@@ -333,27 +481,151 @@
 
     <script>
         const API_URL = "https://sivia-backend.onrender.com/chat";
-        const LOGO_PATH = "images/sivia recuadro derecho.png"; // Ruta del logo
-
-        const STEPS = [
-            "🌎 Investigando en la web...",
-            "🔍 Verificando fuentes...",
-            "📂 Consultando base de datos...",
-            "🖼️ Procesando elementos visuales...",
-            "🧠 Analizando contexto...",
-            "✨ Redactando respuesta..."
-        ];
+        const LOGO_PATH = "images/sivia recuadro derecho.png";
 
         let currentImageBase64 = null;
-        let thinkingInterval;
 
-        // --- FUNCIONES VISUALES ---
+        // --- ESFERA DE ORBES CON LÍNEAS (estilo molecular) ---
+        // Puntos distribuidos con fibonacci en esfera 3D.
+        // Rotación + proyección a 2D gestionada por JS, dibujo por SVG.
+        // Líneas entre nodos cercanos = estilo "modelo molecular".
+        const ORB_COUNT = 14;
+        const ORB_RADIUS = 18;
+        const LINK_DISTANCE = 14; // distancia máxima para trazar línea entre 2 nodos
+        const NODE_R = 1.1;       // radio de cada punto (más chico = más fino)
 
+        const orbNodes = [];
+        const linksGroup = document.getElementById('orb-links');
+        const nodesGroup = document.getElementById('orb-nodes');
+
+        function buildOrbSphere() {
+            const goldenAngle = Math.PI * (1 + Math.sqrt(5));
+            // Calcular posiciones 3D de cada nodo
+            for (let i = 0; i < ORB_COUNT; i++) {
+                const phi = Math.acos(1 - 2 * (i + 0.5) / ORB_COUNT);
+                const theta = goldenAngle * i;
+                orbNodes.push({
+                    x: ORB_RADIUS * Math.sin(phi) * Math.cos(theta),
+                    y: ORB_RADIUS * Math.sin(phi) * Math.sin(theta),
+                    z: ORB_RADIUS * Math.cos(phi),
+                    alt: i % 5 === 2, // algunos nodos morados
+                    phase: Math.random() * Math.PI * 2
+                });
+            }
+            // Pre-crear elementos SVG una sola vez (mejor performance)
+            // Líneas: crear todas las posibles (N*(N-1)/2) y mostrar/ocultar según distancia
+            for (let i = 0; i < ORB_COUNT; i++) {
+                for (let j = i + 1; j < ORB_COUNT; j++) {
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', 0);
+                    line.setAttribute('y1', 0);
+                    line.setAttribute('x2', 0);
+                    line.setAttribute('y2', 0);
+                    line.setAttribute('class', 'link' + ((orbNodes[i].alt || orbNodes[j].alt) ? ' alt' : ''));
+                    line.style.opacity = 0;
+                    orbNodes[i]['link_' + j] = line;
+                    linksGroup.appendChild(line);
+                }
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('r', NODE_R);
+                circle.setAttribute('class', 'node' + (orbNodes[i].alt ? ' alt' : ''));
+                orbNodes[i].el = circle;
+                nodesGroup.appendChild(circle);
+            }
+        }
+
+        let orbRAF = null;
+        let orbStartTime = 0;
+
+        function tickOrbs(timestamp) {
+            if (!orbStartTime) orbStartTime = timestamp;
+            const t = (timestamp - orbStartTime) / 1000;
+            const rotY = t * 0.9;            // velocidad de rotación Y
+            const rotX = 0.4 + Math.sin(t * 0.25) * 0.25; // leve oscilación en X
+            const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+            const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+
+            // Proyectar cada nodo 3D -> 2D con rotación + perspectiva simple
+            const projected = [];
+            for (let i = 0; i < ORB_COUNT; i++) {
+                const n = orbNodes[i];
+                // Rotar Y
+                let x = n.x * cosY + n.z * sinY;
+                let z = -n.x * sinY + n.z * cosY;
+                // Rotar X
+                let y = n.y * cosX - z * sinX;
+                z = n.y * sinX + z * cosX;
+                // Perspectiva (z negativo = lejos)
+                const perspective = 50;
+                const scale = perspective / (perspective + z + ORB_RADIUS);
+                projected.push({
+                    px: x * scale,
+                    py: y * scale,
+                    pz: z,
+                    scale: scale,
+                    n: n
+                });
+            }
+
+            // Actualizar nodos SVG
+            for (let i = 0; i < ORB_COUNT; i++) {
+                const p = projected[i];
+                const pulse = 0.7 + 0.6 * (0.5 + 0.5 * Math.sin(t * 3.5 + p.n.phase));
+                p.n.el.setAttribute('cx', p.px.toFixed(2));
+                p.n.el.setAttribute('cy', p.py.toFixed(2));
+                p.n.el.setAttribute('r', (NODE_R * p.scale * pulse).toFixed(2));
+                // Nodos atrás más tenues (depth fading)
+                const depthFade = (p.pz + ORB_RADIUS) / (2 * ORB_RADIUS); // 0..1
+                p.n.el.style.opacity = (0.35 + 0.65 * depthFade).toFixed(2);
+            }
+
+            // Actualizar líneas entre nodos cercanos (estilo molecular)
+            for (let i = 0; i < ORB_COUNT; i++) {
+                for (let j = i + 1; j < ORB_COUNT; j++) {
+                    const line = orbNodes[i]['link_' + j];
+                    if (!line) continue;
+                    const dx = projected[i].px - projected[j].px;
+                    const dy = projected[i].py - projected[j].py;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < LINK_DISTANCE) {
+                        // Opacidad decrece con distancia (más fuerte cuanto más cerca)
+                        const alpha = (1 - dist / LINK_DISTANCE) * 0.7;
+                        line.setAttribute('x1', projected[i].px.toFixed(2));
+                        line.setAttribute('y1', projected[i].py.toFixed(2));
+                        line.setAttribute('x2', projected[j].px.toFixed(2));
+                        line.setAttribute('y2', projected[j].py.toFixed(2));
+                        line.style.opacity = alpha.toFixed(2);
+                    } else {
+                        line.style.opacity = 0;
+                    }
+                }
+            }
+
+            orbRAF = requestAnimationFrame(tickOrbs);
+        }
+
+        function startOrbsAnim() {
+            if (orbRAF) return;
+            orbStartTime = 0;
+            orbRAF = requestAnimationFrame(tickOrbs);
+        }
+
+        function stopOrbsAnim() {
+            if (orbRAF) {
+                cancelAnimationFrame(orbRAF);
+                orbRAF = null;
+            }
+        }
+
+        buildOrbSphere();
+
+        // --- SCROLL ---
         function scrollToBottom() {
             const container = document.getElementById('chat-stream');
             container.scrollTop = container.scrollHeight;
         }
 
+        // --- FILE UPLOAD ---
         document.getElementById('file-upload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
@@ -366,34 +638,26 @@
             }
         });
 
+        // --- THINKING INDICATOR ---
         function startThinking() {
-            const wrapper = document.getElementById('thinking-indicator');
-            const textEl = document.getElementById('thinking-status');
-            wrapper.classList.add('active');
+            document.getElementById('thinking-indicator').classList.add('active');
+            startOrbsAnim();
             scrollToBottom();
-            let i = 0;
-            textEl.innerText = STEPS[0];
-            thinkingInterval = setInterval(() => {
-                i = (i + 1) % STEPS.length;
-                textEl.innerText = STEPS[i];
-            }, 1200);
         }
 
         function stopThinking() {
-            clearInterval(thinkingInterval);
             document.getElementById('thinking-indicator').classList.remove('active');
+            stopOrbsAnim();
         }
 
-        // FUNCIÓN MODIFICADA PARA USAR EL LOGO EN LUGAR DEL ROBOT
+        // --- ADD MESSAGE ---
         function addMessage(text, sender, imgData = null) {
             const container = document.getElementById('chat-stream');
             const msgDiv = document.createElement('div');
-            msgDiv.className = 'message';
-            
-            const name = sender === 'bot' ? 'SIVIA AI' : 'Tú';
-            const avatarClass = sender === 'bot' ? 'bot' : 'user';
+            msgDiv.className = 'message ' + sender;
 
-            // Lógica del avatar: Logo para bot, Icono para usuario
+            const name = sender === 'bot' ? 'SIVIA' : 'Tú';
+
             let avatarHTML;
             if (sender === 'bot') {
                 avatarHTML = `<img src="${LOGO_PATH}" alt="SIVIA">`;
@@ -403,17 +667,19 @@
 
             let contentHTML = text;
             if (sender === 'bot') {
-                contentHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                                  .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+                // Markdown muy básico: **bold** y links
+                contentHTML = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
             }
 
             let imgHTML = '';
             if (sender === 'user' && imgData) {
-                imgHTML = `<img src="data:image/jpeg;base64,${imgData}">`;
+                imgHTML = `<img src="data:image/jpeg;base64,${imgData}" alt="imagen adjunta">`;
             }
 
             msgDiv.innerHTML = `
-                <div class="avatar ${avatarClass}">${avatarHTML}</div>
+                <div class="avatar ${sender}">${avatarHTML}</div>
                 <div class="content">
                     <div class="user-name">${name}</div>
                     <div class="text-bubble">${contentHTML} ${imgHTML}</div>
@@ -433,10 +699,10 @@
             if (!text && !currentImageBase64) return;
 
             addMessage(text, 'user', currentImageBase64);
-            
+
             input.value = '';
             input.disabled = true;
-            btn.style.color = '#475569';
+            btn.disabled = true;
             document.getElementById('clip-btn').classList.remove('has-file');
             document.getElementById('file-upload').value = '';
 
@@ -454,7 +720,7 @@
 
                 const data = await response.json();
                 stopThinking();
-                addMessage(data.answer, 'bot');
+                addMessage(data.answer || 'Sin respuesta del servidor.', 'bot');
 
             } catch (error) {
                 stopThinking();
@@ -463,16 +729,16 @@
 
             currentImageBase64 = null;
             input.disabled = false;
-            btn.style.color = ''; 
+            btn.disabled = false;
             input.focus();
             scrollToBottom();
         }
 
+        // --- EVENTS ---
         document.getElementById('user-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') handleSend();
         });
         document.getElementById('user-input').focus();
-
     </script>
 </body>
 </html>

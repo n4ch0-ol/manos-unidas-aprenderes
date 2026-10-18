@@ -317,6 +317,42 @@
             50%      { opacity: 0.4; }
         }
 
+        /* --- ACCIONES DE MENSAJE (regenerar, etc.) --- */
+        .message-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .message:hover .message-actions { opacity: 1; }
+        .message-actions button {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 11px;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .message-actions button:hover {
+            background: rgba(56, 189, 248, 0.12);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .message-actions button .material-icons-round {
+            font-size: 13px;
+        }
+        @media (hover: none) {
+            /* En mobile (sin hover) siempre visibles */
+            .message-actions { opacity: 1; }
+        }
+
         /* --- SANDBOX IFRAME (HTML/URL del usuario) --- */
         .sandbox-wrapper {
             margin-top: 12px;
@@ -496,6 +532,283 @@
             letter-spacing: 0.3px;
         }
 
+        /* --- SIDEBAR (historial + usuario) --- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border-soft);
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .new-chat-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(168, 85, 247, 0.18));
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 10px;
+            color: var(--accent);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .new-chat-btn:hover {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(168, 85, 247, 0.3));
+            transform: translateY(-1px);
+        }
+        .new-chat-btn .material-icons-round { font-size: 18px; }
+
+        .close-sidebar {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .close-sidebar:hover { background: rgba(255,255,255,0.05); color: white; }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+        }
+        .chat-list::-webkit-scrollbar { width: 4px; }
+        .chat-list::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 2px;
+        }
+
+        .chat-list-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            padding: 24px 12px;
+            font-style: italic;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 13px;
+            transition: all 0.15s;
+            position: relative;
+            margin-bottom: 2px;
+        }
+        .chat-item:hover {
+            background: rgba(255,255,255,0.06);
+        }
+        .chat-item.active {
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+        .chat-item .chat-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-item .chat-icon {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+        .chat-item .delete-chat {
+            opacity: 0;
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            transition: opacity 0.15s;
+        }
+        .chat-item:hover .delete-chat { opacity: 0.7; }
+        .chat-item .delete-chat:hover { opacity: 1; background: rgba(239, 68, 68, 0.15); }
+        .chat-item .delete-chat .material-icons-round { font-size: 16px; }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border-soft);
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            margin-bottom: 8px;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .user-info { flex: 1; min-width: 0; }
+        .user-info .name {
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-info .email {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .logout-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px;
+            background: transparent;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 8px;
+            color: #fca5a5;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.5);
+        }
+
+        /* Botón hamburguesa para abrir sidebar en mobile */
+        .menu-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .menu-toggle:hover { background: rgba(255,255,255,0.08); }
+
+        /* Overlay para cerrar sidebar al hacer click fuera */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.show {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Pantalla de login requerido */
+        .login-required {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .login-required.show { display: flex; }
+        .login-required .lr-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-soft);
+            border-radius: 20px;
+            padding: 32px 24px;
+            max-width: 360px;
+            width: 100%;
+        }
+        .login-required h2 {
+            color: var(--text-main);
+            font-size: 22px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .login-required p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .login-required .login-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.2s;
+        }
+        .login-required .login-btn:hover { transform: translateY(-2px); }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -503,7 +816,7 @@
 
         /* --- RESPONSIVE --- */
         @media (max-width: 640px) {
-            header { padding: 0 16px; height: 56px; }
+            header { padding: 0 12px; height: 56px; }
             .brand-text { font-size: 16px; }
             .status-pill { font-size: 10px; padding: 3px 8px; }
             .chat-container { padding: 20px 14px; gap: 16px; }
@@ -512,6 +825,7 @@
             .thinking-wrapper { margin-left: 44px; gap: 14px; }
             .orb-scene { width: 48px; height: 48px; }
             .sandbox-iframe { height: 240px; }
+            .sidebar { width: 100%; }
         }
 
         /* Preferencia de movimiento reducido (accesibilidad) */
@@ -527,6 +841,9 @@
 
     <header>
         <div class="brand-area">
+            <button class="menu-toggle" onclick="toggleSidebar()" title="Menú">
+                <span class="material-icons-round">menu</span>
+            </button>
             <img src="images/sivia recuadro derecho.png" alt="SIVIA" class="brand-logo" onerror="this.style.display='none'">
             <span class="brand-text">SIVIA</span>
         </div>
@@ -537,6 +854,50 @@
 
         <!-- El chat arranca vacío. SIVIA responde cuando el usuario envía el primer mensaje. -->
 
+    </div>
+
+    <!-- SIDEBAR (historial + usuario) -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat-btn" onclick="newChat()">
+                <span class="material-icons-round">add</span>
+                Nuevo chat
+            </button>
+            <button class="close-sidebar" onclick="toggleSidebar()" title="Cerrar">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <div class="chat-list" id="chat-list">
+            <div class="chat-list-empty">No hay conversaciones guardadas</div>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-card" id="user-card">
+                <div class="user-avatar" id="user-avatar">?</div>
+                <div class="user-info">
+                    <div class="name" id="user-name">Invitado</div>
+                    <div class="email" id="user-email">No logueado</div>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <span class="material-icons-round" style="font-size:14px;">logout</span>
+                Cerrar sesión
+            </button>
+        </div>
+    </aside>
+
+    <!-- Pantalla de login requerido -->
+    <div class="login-required" id="login-required">
+        <div class="lr-card">
+            <h2>Iniciá sesión para usar SIVIA</h2>
+            <p>Para guardar tu historial de conversaciones y mantener tu identidad, necesitás iniciar sesión con tu cuenta del colegio.</p>
+            <a href="auth.html" class="login-btn">
+                <span class="material-icons-round" style="font-size:18px;">login</span>
+                Iniciar sesión
+            </a>
+        </div>
     </div>
 
     <div class="thinking-wrapper" id="thinking-indicator">
@@ -575,6 +936,7 @@
         <div class="footer-note">SIVIA puede cometer errores. Verifica la información importante.</div>
     </div>
 
+    <script src="js/auth.js"></script>
     <script>
         const API_URL = "https://sivia-backend.onrender.com/chat/stream";
         const API_URL_FALLBACK = "https://sivia-backend.onrender.com/chat";
@@ -582,6 +944,269 @@
         const LOGO_PATH = "images/sivia recuadro derecho.png";
 
         let currentImageBase64 = null;
+        let lastUserMessage = '';  // para regenerar respuesta
+
+        // --- SISTEMA DE HISTORIAL EN LOCALSTORAGE ---
+        // Estructura:
+        //   localStorage['sivia_chats_<email>'] = [
+        //     {
+        //       id: "chat_1700000000000",
+        //       title: "Hola, ¿qué hacés?",
+        //       createdAt: 1700000000000,
+        //       updatedAt: 1700000000000,
+        //       messages: [
+        //         { role: 'user', content: '...', image: null, timestamp: ... },
+        //         { role: 'bot', content: '...', timestamp: ... }
+        //       ]
+        //     }
+        //   ]
+        //   localStorage['sivia_current_chat_<email>'] = "chat_1700000000000"
+
+        let currentChatId = null;
+
+        function getChatsKey() {
+            const email = auth.getCurrentUserEmail() || 'guest';
+            return `sivia_chats_${email}`;
+        }
+
+        function getCurrentChatKey() {
+            const email = auth.getCurrentUserEmail() || 'guest';
+            return `sivia_current_chat_${email}`;
+        }
+
+        function getAllChats() {
+            try {
+                return JSON.parse(localStorage.getItem(getChatsKey()) || '[]');
+            } catch { return []; }
+        }
+
+        function saveAllChats(chats) {
+            localStorage.setItem(getChatsKey(), JSON.stringify(chats));
+        }
+
+        function getCurrentChat() {
+            const chats = getAllChats();
+            if (!currentChatId) {
+                currentChatId = localStorage.getItem(getCurrentChatKey());
+            }
+            return chats.find(c => c.id === currentChatId) || null;
+        }
+
+        function setCurrentChat(chatId) {
+            currentChatId = chatId;
+            if (chatId) {
+                localStorage.setItem(getCurrentChatKey(), chatId);
+            } else {
+                localStorage.removeItem(getCurrentChatKey());
+            }
+            renderChatList();
+        }
+
+        function createNewChat() {
+            const chat = {
+                id: `chat_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+                title: 'Nueva conversación',
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                messages: []
+            };
+            const chats = getAllChats();
+            chats.unshift(chat);
+            saveAllChats(chats);
+            return chat;
+        }
+
+        function deleteChat(chatId) {
+            if (!confirm('¿Eliminar esta conversación? No se puede deshacer.')) return;
+            let chats = getAllChats();
+            chats = chats.filter(c => c.id !== chatId);
+            saveAllChats(chats);
+            if (currentChatId === chatId) {
+                setCurrentChat(null);
+                clearChatUI();
+            }
+            renderChatList();
+        }
+
+        function addMessageToChat(role, content, image = null) {
+            let chat = getCurrentChat();
+            if (!chat) {
+                chat = createNewChat();
+                setCurrentChat(chat.id);
+            }
+            chat.messages.push({
+                role,
+                content,
+                image,
+                timestamp: Date.now()
+            });
+            chat.updatedAt = Date.now();
+            // Si es el primer mensaje del usuario, usarlo como título
+            if (role === 'user' && chat.title === 'Nueva conversación') {
+                chat.title = content.slice(0, 40) + (content.length > 40 ? '...' : '');
+            }
+            const chats = getAllChats();
+            const idx = chats.findIndex(c => c.id === chat.id);
+            if (idx >= 0) chats[idx] = chat;
+            saveAllChats(chats);
+            renderChatList();
+        }
+
+        function updateLastBotMessage(content) {
+            const chat = getCurrentChat();
+            if (!chat) return;
+            const lastBot = [...chat.messages].reverse().find(m => m.role === 'bot');
+            if (lastBot) {
+                lastBot.content = content;
+                const chats = getAllChats();
+                const idx = chats.findIndex(c => c.id === chat.id);
+                if (idx >= 0) {
+                    chats[idx] = chat;
+                    saveAllChats(chats);
+                }
+            }
+        }
+
+        // Devuelve los mensajes previos del chat actual para mandar al backend
+        // (sin incluir el mensaje que se está por enviar)
+        function getHistoryForRequest() {
+            const chat = getCurrentChat();
+            if (!chat) return [];
+            // Excluir el último mensaje si es del usuario (recién agregado)
+            const msgs = chat.messages.slice();
+            // El último mensaje agregado es el del user actual → lo sacamos
+            // porque el backend lo va a agregar aparte
+            if (msgs.length > 0 && msgs[msgs.length - 1].role === 'user') {
+                msgs.pop();
+            }
+            // Formato simple: [{role, content}, ...]
+            return msgs.map(m => ({
+                role: m.role,
+                content: m.content
+            }));
+        }
+
+        function loadChat(chatId) {
+            const chats = getAllChats();
+            const chat = chats.find(c => c.id === chatId);
+            if (!chat) return;
+            setCurrentChat(chatId);
+            clearChatUI();
+            // Renderizar todos los mensajes
+            chat.messages.forEach(msg => {
+                if (msg.role === 'user') {
+                    addMessage(msg.content, 'user', msg.image);
+                } else {
+                    addMessage(msg.content, 'bot');
+                }
+            });
+            // Cerrar sidebar en mobile
+            if (window.innerWidth <= 640) toggleSidebar(false);
+        }
+
+        function clearChatUI() {
+            document.getElementById('chat-stream').innerHTML = '';
+        }
+
+        function newChat() {
+            setCurrentChat(null);
+            clearChatUI();
+            if (window.innerWidth <= 640) toggleSidebar(false);
+            document.getElementById('user-input').focus();
+        }
+
+        function renderChatList() {
+            const list = document.getElementById('chat-list');
+            const chats = getAllChats();
+            if (chats.length === 0) {
+                list.innerHTML = '<div class="chat-list-empty">No hay conversaciones guardadas</div>';
+                return;
+            }
+            list.innerHTML = '';
+            chats.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = 'chat-item' + (chat.id === currentChatId ? ' active' : '');
+                item.innerHTML = `
+                    <span class="material-icons-round chat-icon">chat_bubble_outline</span>
+                    <span class="chat-title">${escapeHtml(chat.title)}</span>
+                    <button class="delete-chat" title="Eliminar" data-id="${chat.id}">
+                        <span class="material-icons-round">delete</span>
+                    </button>
+                `;
+                item.addEventListener('click', (e) => {
+                    if (e.target.closest('.delete-chat')) return;
+                    loadChat(chat.id);
+                });
+                item.querySelector('.delete-chat').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteChat(chat.id);
+                });
+                list.appendChild(item);
+            });
+        }
+
+        // --- UI DEL SIDEBAR ---
+        function toggleSidebar(force) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const willOpen = force === undefined ? !sidebar.classList.contains('open') : force;
+            if (willOpen) {
+                sidebar.classList.add('open');
+                overlay.classList.add('show');
+            } else {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            }
+        }
+
+        function updateUserCard() {
+            const nameEl = document.getElementById('user-name');
+            const emailEl = document.getElementById('user-email');
+            const avatarEl = document.getElementById('user-avatar');
+            if (auth.isLoggedIn()) {
+                const name = auth.getUsername() || 'Usuario';
+                const email = auth.getCurrentUserEmail() || '';
+                nameEl.textContent = name;
+                emailEl.textContent = email;
+                avatarEl.textContent = name.charAt(0).toUpperCase();
+            } else {
+                nameEl.textContent = 'Invitado';
+                emailEl.textContent = 'No logueado';
+                avatarEl.textContent = '?';
+            }
+        }
+
+        function logout() {
+            if (!confirm('¿Cerrar sesión? El historial queda guardado en este navegador.')) return;
+            auth.logout();
+            updateUserCard();
+            renderChatList();
+            clearChatUI();
+            setCurrentChat(null);
+            checkAuthRequired();
+        }
+
+        // --- VERIFICACIÓN DE LOGIN ---
+        // Si el usuario no está logueado, muestra pantalla pidiendo login.
+        // (No bloquea 100%: si hace click fuera, puede usar Sivia como invitado,
+        //  pero su historial no se guardará entre sesiones)
+        let authChecked = false;
+        function checkAuthRequired() {
+            const lr = document.getElementById('login-required');
+            if (!auth.isLoggedIn()) {
+                lr.classList.add('show');
+            } else {
+                lr.classList.remove('show');
+                if (!authChecked) {
+                    authChecked = true;
+                    // Cargar último chat o crear uno nuevo
+                    const lastChatId = localStorage.getItem(getCurrentChatKey());
+                    if (lastChatId) {
+                        loadChat(lastChatId);
+                    }
+                }
+            }
+        }
 
         // --- FASES DE RESPALDO (si el modelo no emite reasoning_content) ---
         const FALLBACK_PHASES = [
@@ -1062,30 +1687,48 @@
             content.appendChild(ind);
         }
 
-        async function handleSend() {
+        async function handleSend(regenerateData = null) {
             const input = document.getElementById('user-input');
-            const text = input.value.trim();
+            const btn = document.getElementById('send-btn');
 
-            if (!text && !currentImageBase64) return;
+            let text, imageData;
+            if (regenerateData) {
+                // Venimos del botón "Regenerar" → reusar último mensaje
+                text = regenerateData.text;
+                imageData = regenerateData.image;
+                // Eliminar burbuja del bot anterior (la que tiene el botón regenerar clickeado)
+                if (regenerateData.oldBubble) {
+                    removeBotBubble(regenerateData.oldBubble);
+                }
+            } else {
+                text = input.value.trim();
+                imageData = currentImageBase64;
+                if (!text && !imageData) return;
+                if (isGenerating) return;
 
-            if (isGenerating) return;
+                addMessage(text, 'user', imageData);
+                lastUserMessage = text;
+                lastUserImage = imageData;
+                // Guardar en historial
+                addMessageToChat('user', text, imageData);
 
-            addMessage(text, 'user', currentImageBase64);
+                // Si era HTML o URL, NO mandar al backend
+                if (isHtmlPayload(text) || isUrlPayload(text)) {
+                    input.value = '';
+                    document.getElementById('clip-btn').classList.remove('has-file');
+                    document.getElementById('file-upload').value = '';
+                    currentImageBase64 = null;
+                    lastUserMessage = '';
+                    input.focus();
+                    scrollToBottom();
+                    return;
+                }
 
-            // Si era HTML o URL, NO mandar al backend como pregunta normal
-            if (isHtmlPayload(text) || isUrlPayload(text)) {
                 input.value = '';
                 document.getElementById('clip-btn').classList.remove('has-file');
                 document.getElementById('file-upload').value = '';
                 currentImageBase64 = null;
-                input.focus();
-                scrollToBottom();
-                return;
             }
-
-            input.value = '';
-            document.getElementById('clip-btn').classList.remove('has-file');
-            document.getElementById('file-upload').value = '';
 
             startThinking();
             setGeneratingState(true);
@@ -1094,13 +1737,17 @@
             currentAnswerText = '';
             currentAbortController = new AbortController();
 
+            const questionText = text;
+            const questionImage = imageData;
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        question: text,
-                        image: currentImageBase64
+                        question: questionText,
+                        image: questionImage,
+                        history: getHistoryForRequest()
                     }),
                     signal: currentAbortController.signal
                 });
@@ -1145,14 +1792,24 @@
                                 firstChunkArrived = true;
                                 stopThinking();
                                 showBotBubble(currentBotBubble);
+                                // Crear entrada vacía para el bot en el historial
+                                addMessageToChat('bot', '');
                             }
                             currentAnswerText += data.text;
                             updateBotBubble(currentBotBubble, currentAnswerText);
+                            // Actualizar historial (throttled: cada 50 caracteres)
+                            if (currentAnswerText.length % 50 === 0) {
+                                updateLastBotMessage(currentAnswerText);
+                            }
                         } else if (eventType === 'done') {
                             if (!firstChunkArrived) {
                                 stopThinking();
                                 showBotBubble(currentBotBubble);
                                 updateBotBubble(currentBotBubble, currentAnswerText || '(Sin respuesta)');
+                                addMessageToChat('bot', currentAnswerText || '(Sin respuesta)');
+                            } else {
+                                // Guardar respuesta final completa
+                                updateLastBotMessage(currentAnswerText);
                             }
                             break;
                         } else if (eventType === 'error') {
@@ -1167,6 +1824,10 @@
                 currentAbortController = null;
                 if (isGenerating) {
                     setGeneratingState(false);
+                }
+                // Agregar botón "Regenerar" debajo de la respuesta
+                if (currentBotBubble) {
+                    addMessageActions(currentBotBubble, questionText, questionImage);
                 }
 
             } catch (error) {
@@ -1184,20 +1845,60 @@
                     const fb = await fetch(API_URL_FALLBACK, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ question: text, image: currentImageBase64 })
+                        body: JSON.stringify({
+                            question: questionText,
+                            image: questionImage,
+                            history: getHistoryForRequest()
+                        })
                     });
                     const d = await fb.json();
                     addMessage(d.answer || 'Sin respuesta del servidor.', 'bot');
+                    // Guardar en historial también en modo fallback
+                    addMessageToChat('bot', d.answer || 'Sin respuesta del servidor.');
+                    // El último mensaje del bot (del fallback) también puede regenerarse
+                    const container = document.getElementById('chat-stream');
+                    const lastBot = container.querySelector('.message.bot:last-child');
+                    if (lastBot) addMessageActions(lastBot, questionText, questionImage);
                 } catch (e2) {
                     addMessage("⚠️ Error de conexión. El servidor puede estar 'durmiendo' (espera 30s) o no tienes internet.", 'bot');
                 }
             } finally {
                 currentBotBubble = null;
                 currentAnswerText = '';
-                currentImageBase64 = null;
+                if (!regenerateData) {
+                    currentImageBase64 = null;
+                }
                 document.getElementById('user-input').focus();
                 scrollToBottom();
             }
+        }
+
+        // --- ACCIONES DE MENSAJE (Regenerar) ---
+        let lastUserImage = null;
+
+        function addMessageActions(msgDiv, originalText, originalImage) {
+            if (!msgDiv) return;
+            const content = msgDiv.querySelector('.content');
+            if (!content) return;
+            // No duplicar si ya tiene acciones
+            if (content.querySelector('.message-actions')) return;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+
+            const regenBtn = document.createElement('button');
+            regenBtn.title = 'Regenerar respuesta';
+            regenBtn.innerHTML = '<span class="material-icons-round">refresh</span> Regenerar';
+            regenBtn.addEventListener('click', () => {
+                if (isGenerating) return;
+                handleSend({
+                    text: originalText,
+                    image: originalImage,
+                    oldBubble: msgDiv
+                });
+            });
+            actionsDiv.appendChild(regenBtn);
+            content.appendChild(actionsDiv);
         }
 
         // --- HELPERS PARA LA BURBUJA DE RESPUESTA STREAMING ---
@@ -1251,7 +1952,36 @@
                 }
             }
         });
-        document.getElementById('user-input').focus();
+
+        // --- INICIALIZACIÓN ---
+        window.addEventListener('DOMContentLoaded', () => {
+            updateUserCard();
+            renderChatList();
+            checkAuthRequired();
+            // Auto-abrir sidebar en desktop si hay usuario logueado
+            if (auth.isLoggedIn() && window.innerWidth > 1024) {
+                setTimeout(() => toggleSidebar(true), 300);
+            }
+            document.getElementById('user-input').focus();
+        });
+
+        // Atajos de teclado
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + N → nuevo chat
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n' && !e.shiftKey) {
+                e.preventDefault();
+                newChat();
+            }
+            // Ctrl/Cmd + B → toggle sidebar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+                e.preventDefault();
+                toggleSidebar();
+            }
+            // Esc → cerrar sidebar
+            if (e.key === 'Escape') {
+                toggleSidebar(false);
+            }
+        });
     </script>
 </body>
 </html>

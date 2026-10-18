@@ -317,6 +317,63 @@
             50%      { opacity: 0.4; }
         }
 
+        /* --- SANDBOX IFRAME (HTML/URL del usuario) --- */
+        .sandbox-wrapper {
+            margin-top: 12px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(15, 23, 42, 0.6);
+            max-width: 100%;
+        }
+
+        .sandbox-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: rgba(168, 85, 247, 0.15);
+            color: #d8b4fe;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .sandbox-toggle {
+            margin-left: auto;
+            background: transparent;
+            border: none;
+            color: #d8b4fe;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+        }
+        .sandbox-toggle:hover { background: rgba(168, 85, 247, 0.2); }
+
+        .sandbox-iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+            background: white;
+            transition: height 0.2s;
+        }
+
+        .sandbox-log {
+            max-height: 100px;
+            overflow-y: auto;
+            padding: 8px 10px;
+            background: rgba(0, 0, 0, 0.3);
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        .log-line {
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
         /* --- INPUT AREA --- */
         .input-wrapper {
             position: relative;
@@ -454,6 +511,7 @@
             .text-bubble { font-size: 14px; padding: 10px 14px; }
             .thinking-wrapper { margin-left: 44px; gap: 14px; }
             .orb-scene { width: 48px; height: 48px; }
+            .sandbox-iframe { height: 240px; }
         }
 
         /* Preferencia de movimiento reducido (accesibilidad) */
@@ -520,12 +578,12 @@
     <script>
         const API_URL = "https://sivia-backend.onrender.com/chat/stream";
         const API_URL_FALLBACK = "https://sivia-backend.onrender.com/chat";
+        const FETCH_PAGE_URL = "https://sivia-backend.onrender.com/fetch-page";
         const LOGO_PATH = "images/sivia recuadro derecho.png";
 
         let currentImageBase64 = null;
 
         // --- FASES DE RESPALDO (si el modelo no emite reasoning_content) ---
-        // Se activan por tiempo. Si llega un status real, se reemplazan.
         const FALLBACK_PHASES = [
             { delay: 0,    label: "Pensando" },
             { delay: 1500, label: "Analizando contexto" },
@@ -540,14 +598,11 @@
         let currentBotBubble = null;
         let currentAnswerText = '';
 
-        // --- ESFERA DE ORBES CON LÍNEAS (estilo molecular) ---
-        // Puntos distribuidos con fibonacci en esfera 3D.
-        // Rotación + proyección a 2D gestionada por JS, dibujo por SVG.
-        // Líneas entre nodos cercanos = estilo "modelo molecular".
+        // --- ESFERA DE ORBES (estilo molecular) ---
         const ORB_COUNT = 14;
         const ORB_RADIUS = 18;
-        const LINK_DISTANCE = 14; // distancia máxima para trazar línea entre 2 nodos
-        const NODE_R = 1.1;       // radio de cada punto (más chico = más fino)
+        const LINK_DISTANCE = 14;
+        const NODE_R = 1.1;
 
         const orbNodes = [];
         const linksGroup = document.getElementById('orb-links');
@@ -555,7 +610,6 @@
 
         function buildOrbSphere() {
             const goldenAngle = Math.PI * (1 + Math.sqrt(5));
-            // Calcular posiciones 3D de cada nodo
             for (let i = 0; i < ORB_COUNT; i++) {
                 const phi = Math.acos(1 - 2 * (i + 0.5) / ORB_COUNT);
                 const theta = goldenAngle * i;
@@ -563,12 +617,10 @@
                     x: ORB_RADIUS * Math.sin(phi) * Math.cos(theta),
                     y: ORB_RADIUS * Math.sin(phi) * Math.sin(theta),
                     z: ORB_RADIUS * Math.cos(phi),
-                    alt: i % 5 === 2, // algunos nodos morados
+                    alt: i % 5 === 2,
                     phase: Math.random() * Math.PI * 2
                 });
             }
-            // Pre-crear elementos SVG una sola vez (mejor performance)
-            // Líneas: crear todas las posibles (N*(N-1)/2) y mostrar/ocultar según distancia
             for (let i = 0; i < ORB_COUNT; i++) {
                 for (let j = i + 1; j < ORB_COUNT; j++) {
                     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -595,22 +647,18 @@
         function tickOrbs(timestamp) {
             if (!orbStartTime) orbStartTime = timestamp;
             const t = (timestamp - orbStartTime) / 1000;
-            const rotY = t * 0.9;            // velocidad de rotación Y
-            const rotX = 0.4 + Math.sin(t * 0.25) * 0.25; // leve oscilación en X
+            const rotY = t * 0.9;
+            const rotX = 0.4 + Math.sin(t * 0.25) * 0.25;
             const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
             const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
 
-            // Proyectar cada nodo 3D -> 2D con rotación + perspectiva simple
             const projected = [];
             for (let i = 0; i < ORB_COUNT; i++) {
                 const n = orbNodes[i];
-                // Rotar Y
                 let x = n.x * cosY + n.z * sinY;
                 let z = -n.x * sinY + n.z * cosY;
-                // Rotar X
                 let y = n.y * cosX - z * sinX;
                 z = n.y * sinX + z * cosX;
-                // Perspectiva (z negativo = lejos)
                 const perspective = 50;
                 const scale = perspective / (perspective + z + ORB_RADIUS);
                 projected.push({
@@ -622,19 +670,16 @@
                 });
             }
 
-            // Actualizar nodos SVG
             for (let i = 0; i < ORB_COUNT; i++) {
                 const p = projected[i];
                 const pulse = 0.7 + 0.6 * (0.5 + 0.5 * Math.sin(t * 3.5 + p.n.phase));
                 p.n.el.setAttribute('cx', p.px.toFixed(2));
                 p.n.el.setAttribute('cy', p.py.toFixed(2));
                 p.n.el.setAttribute('r', (NODE_R * p.scale * pulse).toFixed(2));
-                // Nodos atrás más tenues (depth fading)
-                const depthFade = (p.pz + ORB_RADIUS) / (2 * ORB_RADIUS); // 0..1
+                const depthFade = (p.pz + ORB_RADIUS) / (2 * ORB_RADIUS);
                 p.n.el.style.opacity = (0.35 + 0.65 * depthFade).toFixed(2);
             }
 
-            // Actualizar líneas entre nodos cercanos (estilo molecular)
             for (let i = 0; i < ORB_COUNT; i++) {
                 for (let j = i + 1; j < ORB_COUNT; j++) {
                     const line = orbNodes[i]['link_' + j];
@@ -643,7 +688,6 @@
                     const dy = projected[i].py - projected[j].py;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < LINK_DISTANCE) {
-                        // Opacidad decrece con distancia (más fuerte cuanto más cerca)
                         const alpha = (1 - dist / LINK_DISTANCE) * 0.7;
                         line.setAttribute('x1', projected[i].px.toFixed(2));
                         line.setAttribute('y1', projected[i].py.toFixed(2));
@@ -712,8 +756,6 @@
                     if (elapsed >= FALLBACK_PHASES[i].delay) {
                         if (i !== fallbackIdx) {
                             fallbackIdx = i;
-                            // Solo cambiamos si no llegó un status real todavía
-                            // (el status real sobreescribe vía setThinkingStatus)
                             setThinkingStatus(FALLBACK_PHASES[i].label);
                         }
                         break;
@@ -742,7 +784,32 @@
             stopFallbackPhases();
         }
 
-        // --- ADD MESSAGE ---
+        // --- UTILIDADES ANTI-XSS ---
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Detecta si un texto parece HTML completo (no solo <b> o <strong> del markdown)
+        function isHtmlPayload(text) {
+            const t = text.trim().toLowerCase();
+            return t.includes('<!doctype') ||
+                   t.includes('<html') ||
+                   t.includes('<body') ||
+                   (t.includes('<div') && t.includes('</div>') && t.includes('<script'));
+        }
+
+        // Detecta si el texto es una URL sola (sin espacios, http/https)
+        function isUrlPayload(text) {
+            const t = text.trim();
+            return /^https?:\/\/\S+$/.test(t) && !t.includes(' ');
+        }
+
+        // --- ADD MESSAGE (con escape + iframe sandboxed si es HTML o URL) ---
         function addMessage(text, sender, imgData = null) {
             const container = document.getElementById('chat-stream');
             const msgDiv = document.createElement('div');
@@ -757,10 +824,15 @@
                 avatarHTML = `<span class="material-icons-round">person</span>`;
             }
 
-            let contentHTML = text;
+            // Detectar si el usuario pasó HTML o URL para ejecutar
+            const isHtml = sender === 'user' && isHtmlPayload(text);
+            const isUrl = sender === 'user' && !isHtml && isUrlPayload(text);
+
+            // Texto SIEMPRE escapado primero (anti-XSS)
+            let safeText = escapeHtml(text);
+            let contentHTML = safeText;
             if (sender === 'bot') {
-                // Markdown muy básico: **bold** y links
-                contentHTML = text
+                contentHTML = safeText
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
             }
@@ -770,20 +842,171 @@
                 imgHTML = `<img src="data:image/jpeg;base64,${imgData}" alt="imagen adjunta">`;
             }
 
+            // Iframe para HTML del usuario
+            let iframeHTML = '';
+            if (isHtml) {
+                iframeHTML = `
+                    <div class="sandbox-wrapper">
+                        <div class="sandbox-header">
+                            <span class="material-icons-round" style="font-size:14px;">code</span>
+                            <span>Página del usuario · aislada</span>
+                            <button class="sandbox-toggle" onclick="toggleSandbox(this)" title="Expandir/Contraer">
+                                <span class="material-icons-round" style="font-size:16px;">unfold_more</span>
+                            </button>
+                        </div>
+                        <iframe class="sandbox-iframe"
+                                sandbox="allow-scripts allow-forms allow-modals"
+                                srcdoc="${escapeHtml(text)}"></iframe>
+                        <div class="sandbox-log" data-log></div>
+                    </div>
+                `;
+            }
+
+            // Iframe para URL (se carga con fetch desde el backend)
+            let urlHtml = '';
+            if (isUrl) {
+                urlHtml = `
+                    <div class="sandbox-wrapper" data-url-fetch="${escapeHtml(text.trim())}">
+                        <div class="sandbox-header">
+                            <span class="material-icons-round" style="font-size:14px;">language</span>
+                            <span class="url-fetch-status">Cargando página...</span>
+                            <button class="sandbox-toggle" onclick="toggleSandbox(this)" title="Expandir/Contraer">
+                                <span class="material-icons-round" style="font-size:16px;">unfold_more</span>
+                            </button>
+                        </div>
+                        <iframe class="sandbox-iframe"
+                                sandbox="allow-scripts allow-forms allow-modals"
+                                srcdoc=""></iframe>
+                        <div class="sandbox-log" data-log></div>
+                    </div>
+                `;
+            }
+
             msgDiv.innerHTML = `
                 <div class="avatar ${sender}">${avatarHTML}</div>
                 <div class="content">
                     <div class="user-name">${name}</div>
                     <div class="text-bubble">${contentHTML} ${imgHTML}</div>
+                    ${iframeHTML}
+                    ${urlHtml}
                 </div>
             `;
 
             container.appendChild(msgDiv);
+
+            // Configurar iframe si es HTML directo
+            if (isHtml) {
+                setupIframeObserver(msgDiv.querySelector('.sandbox-iframe'), msgDiv.querySelector('[data-log]'));
+            }
+
+            // Disparar fetch de URL si corresponde
+            if (isUrl) {
+                fetchPageIntoIframe(msgDiv.querySelector('[data-url-fetch]'));
+            }
+
             scrollToBottom();
         }
-                // --- LÓGICA DE ENVÍO (STREAMING SSE) ---
+
+        // --- TOGGLE SANDBOX (expandir/contraer) ---
+        function toggleSandbox(btn) {
+            const wrapper = btn.closest('.sandbox-wrapper');
+            const iframe = wrapper.querySelector('iframe');
+            const log = wrapper.querySelector('.sandbox-log');
+            if (iframe.style.height === '0px') {
+                iframe.style.height = '300px';
+                log.style.display = '';
+            } else {
+                iframe.style.height = '0px';
+                log.style.display = 'none';
+            }
+        }
+
+        // --- OBSERVADOR DE INTERACCIONES DENTRO DEL IFRAME ---
+        function setupIframeObserver(iframe, logEl) {
+            iframe.addEventListener('load', () => {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    const script = doc.createElement('script');
+                    script.textContent = `
+                        (function() {
+                            function report(type, data) {
+                                window.parent.postMessage({ source: 'sivia-sandbox', type, data, ts: Date.now() }, '*');
+                            }
+                            document.addEventListener('click', e => {
+                                report('click', { tag: e.target.tagName, text: (e.target.innerText || '').slice(0, 80) });
+                            }, true);
+                            document.addEventListener('input', e => {
+                                report('input', { tag: e.target.tagName, name: e.target.name || '', value: (e.target.value || '').slice(0, 80) });
+                            }, true);
+                            document.addEventListener('submit', e => {
+                                report('submit', { action: e.target.action || '' });
+                            }, true);
+                            window.addEventListener('error', e => {
+                                report('error', { message: e.message });
+                            });
+                            report('ready', { title: document.title });
+                        })();
+                    `;
+                    if (doc.body) {
+                        doc.body.appendChild(script);
+                    } else {
+                        doc.documentElement.appendChild(script);
+                    }
+                } catch (e) {
+                    console.warn('No se pudo observar el iframe:', e);
+                }
+            });
+
+            const observer = (event) => {
+                if (event.data && event.data.source === 'sivia-sandbox') {
+                    const { type, data, ts } = event.data;
+                    const time = new Date(ts).toLocaleTimeString('es-AR');
+                    const line = document.createElement('div');
+                    line.className = 'log-line';
+                    line.textContent = `[${time}] ${type}: ${JSON.stringify(data)}`;
+                    logEl.appendChild(line);
+                    logEl.scrollTop = logEl.scrollHeight;
+                }
+            };
+            window.addEventListener('message', observer);
+        }
+
+        // --- FETCH DE URL → RENDERIZAR EN IFRAME ---
+        async function fetchPageIntoIframe(wrapper) {
+            if (!wrapper) return;
+            const url = wrapper.getAttribute('data-url-fetch');
+            const iframe = wrapper.querySelector('iframe');
+            const statusEl = wrapper.querySelector('.url-fetch-status');
+            const logEl = wrapper.querySelector('[data-log]');
+
+            try {
+                const r = await fetch(FETCH_PAGE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                const data = await r.json();
+
+                if (data.error) {
+                    statusEl.textContent = '⚠️ ' + data.error;
+                    statusEl.style.color = '#fca5a5';
+                    iframe.style.height = '0px';
+                    return;
+                }
+
+                statusEl.textContent = '🌐 ' + (data.title || data.url);
+                iframe.setAttribute('srcdoc', data.html);
+                iframe.style.height = '400px';
+                setupIframeObserver(iframe, logEl);
+            } catch (e) {
+                statusEl.textContent = '⚠️ Error de conexión con el backend';
+                statusEl.style.color = '#fca5a5';
+                iframe.style.height = '0px';
+            }
+        }
+
+        // --- LÓGICA DE ENVÍO (STREAMING SSE) ---
         function handleSendClick() {
-            // Si está generando, el botón actúa como STOP
             if (isGenerating) {
                 stopGeneration();
                 return;
@@ -801,7 +1024,7 @@
                 btn.classList.remove('send-btn');
                 btn.title = 'Detener';
                 icon.textContent = 'stop';
-                input.disabled = false; // dejamos escribir mientras genera
+                input.disabled = false;
             } else {
                 btn.classList.remove('stop-btn');
                 btn.classList.add('send-btn');
@@ -818,11 +1041,9 @@
                 currentAbortController = null;
             }
             stopThinking();
-            // Dejar la respuesta parcial escrita + indicador de detención
             if (currentBotBubble && currentAnswerText) {
                 appendStopIndicator(currentBotBubble);
             } else if (currentBotBubble) {
-                // Si no llegó ni un chunk, sacamos la burbuja vacía
                 removeBotBubble(currentBotBubble);
                 addMessage("⏹️ Generación detenida por el usuario.", 'bot');
             }
@@ -844,14 +1065,23 @@
         async function handleSend() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
-            const btn = document.getElementById('send-btn');
 
             if (!text && !currentImageBase64) return;
 
-            // Si ya está generando, no hace nada (el click lo maneja stopGeneration)
             if (isGenerating) return;
 
             addMessage(text, 'user', currentImageBase64);
+
+            // Si era HTML o URL, NO mandar al backend como pregunta normal
+            if (isHtmlPayload(text) || isUrlPayload(text)) {
+                input.value = '';
+                document.getElementById('clip-btn').classList.remove('has-file');
+                document.getElementById('file-upload').value = '';
+                currentImageBase64 = null;
+                input.focus();
+                scrollToBottom();
+                return;
+            }
 
             input.value = '';
             document.getElementById('clip-btn').classList.remove('has-file');
@@ -860,7 +1090,6 @@
             startThinking();
             setGeneratingState(true);
 
-            // Crear burbuja de respuesta vacía para ir llenándola con los chunks
             currentBotBubble = createEmptyBotBubble();
             currentAnswerText = '';
             currentAbortController = new AbortController();
@@ -891,9 +1120,8 @@
 
                     buffer += decoder.decode(value, { stream: true });
 
-                    // Los eventos SSE vienen separados por doble salto de línea
                     const events = buffer.split('\n\n');
-                    buffer = events.pop(); // mantener incompleto
+                    buffer = events.pop();
 
                     for (const evt of events) {
                         const lines = evt.split('\n');
@@ -910,11 +1138,9 @@
                         catch { continue; }
 
                         if (eventType === 'status') {
-                            // Status real del razonamiento del modelo → pisa las fases
                             stopFallbackPhases();
                             setThinkingStatus(data.text);
                         } else if (eventType === 'chunk') {
-                            // Llegó un fragmento de respuesta → mostrarlo
                             if (!firstChunkArrived) {
                                 firstChunkArrived = true;
                                 stopThinking();
@@ -938,7 +1164,6 @@
                     }
                 }
 
-                // Limpieza post-stream exitoso
                 currentAbortController = null;
                 if (isGenerating) {
                     setGeneratingState(false);
@@ -947,9 +1172,7 @@
             } catch (error) {
                 currentAbortController = null;
 
-                // Si fue cancelado por el usuario, no hacer nada extra (stopGeneration ya manejó)
                 if (error.name === 'AbortError') {
-                    // Ya manejado por stopGeneration()
                     return;
                 }
 
@@ -957,7 +1180,6 @@
                 removeBotBubble(currentBotBubble);
                 setGeneratingState(false);
 
-                // Fallback al endpoint no-streaming si el streaming falla por otra razón
                 try {
                     const fb = await fetch(API_URL_FALLBACK, {
                         method: 'POST',
@@ -983,7 +1205,7 @@
             const container = document.getElementById('chat-stream');
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message bot';
-            msgDiv.style.display = 'none'; // oculta hasta que llegue el primer chunk
+            msgDiv.style.display = 'none';
             msgDiv.innerHTML = `
                 <div class="avatar bot"><img src="${LOGO_PATH}" alt="SIVIA"></div>
                 <div class="content">
@@ -1009,7 +1231,6 @@
         function updateBotBubble(msgDiv, rawText) {
             const bubble = msgDiv.querySelector('.text-bubble');
             if (!bubble) return;
-            // Markdown muy básico para la respuesta en streaming
             let html = rawText
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
@@ -1024,7 +1245,6 @@
         document.getElementById('user-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 if (isGenerating) {
-                    // Si está generando, Enter también detiene (como ChatGPT)
                     stopGeneration();
                 } else {
                     handleSend();

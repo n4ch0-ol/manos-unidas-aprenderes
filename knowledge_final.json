@@ -1,302 +1,297 @@
 {
-    "identidad_ce": "Soy SIVIA, la asistente virtual de Manos Unidas, lista del Centro de Estudiantes. Conozco todas nuestras propuestas y puedo ayudarte con información sobre eventos, torneos, y proyectos educativos.",
-    
-    "manos_unidas": {
-        "nombre": "Manos Unidas",
-        "tipo": "Lista del Centro de Estudiantes",
-        "eslogan": "Construyendo el futuro juntos",
-        "valores": ["Participación", "Innovación", "Comunidad", "Transparencia"],
-        "objetivo_principal": "Mejorar la experiencia educativa y crear una comunidad estudiantil activa y participativa"
-    },
-    
-    "votaciones": {
-        "fecha": "4 de noviembre de 2024",
-        "listas_candidatas": ["Lista Mentes en Marcha", "Lista Manos Unidas"],
-        "mensaje": "Este 4 de noviembre, forma parte del cambio votando a la Lista Manos Unidas",
-        "como_votar": "Las votaciones se realizan en el colegio durante el horario escolar",
-        "importancia": "Elegir al Centro de Estudiantes es clave para representar tus intereses y mejorar la vida escolar"
-    },
-    
-    "torneos_concursos": {
-        "descripcion": "Diversificamos los concursos y torneos del colegio para que haya actividades para todos los gustos",
-        "objetivo": "Crear instancias recreativas que incluyan a todos los estudiantes según sus intereses",
-        "torneos_disponibles": {
-            "truco": {
-                "nombre": "Torneo de Truco",
-                "descripcion": "Torneo del clásico juego de cartas argentino. Fomenta camaradería y astucia.",
-                "ubicacion": "En búsqueda del lugar ideal",
-                "tipo": "Juego de mesa tradicional",
-                "participantes": "Parejas de estudiantes",
-                "objetivo": "Fomentar un espacio de camaradería y astucia con este clásico infaltable"
-            },
-            "valorant": {
-                "nombre": "Torneo de Valorant",
-                "descripcion": "Torneo de acción táctica 5v5 para amantes de los shooters competitivos",
-                "aclaracion": "NO se realiza dentro de la institución",
-                "tipo": "Videojuego - FPS táctico",
-                "equipos": "5 jugadores por equipo",
-                "razon": "Como el concurso de Minecraft puede resultar aburrido a muchas personas, decidimos crear más opciones"
-            },
-            "minecraft": {
-                "nombre": "Torneo de Minecraft",
-                "descripcion": "Torneo de construcción basado en el concurso de Globant. Los participantes compiten en un servidor exclusivo demostrando su creatividad",
-                "origen": "Inspirado en el concurso de construcción de Globant",
-                "objetivo": "Crear una instancia recreativa en el colegio",
-                "tipo": "Videojuego - Construcción creativa",
-                "modalidad": "Servidor exclusivo con diversos concursos de construcción"
-            },
-            "football": {
-                "nombre": "Torneo de Fútbol",
-                "descripcion": "Torneo de fútbol para reunir estudiantes en un ambiente competitivo",
-                "razon": "Para quienes prefieren deportes tradicionales sobre videojuegos o juegos de mesa",
-                "tipo": "Deporte",
-                "formato": "Partidos competitivos entre equipos estudiantiles",
-                "objetivo": "Incluir a quienes no les gustan los videojuegos o juegos de mesa"
-            },
-            "ajedrez": {
-                "nombre": "Torneo de Ajedrez",
-                "descripcion": "Torneo de ajedrez para quienes prefieren juegos de estrategia que requieren pensamiento profundo",
-                "objetivo": "Fomentar la creatividad y habilidad estratégica",
-                "tipo": "Juego de mesa - Estrategia",
-                "publico": "Para aquellos que tienen más materia gris y prefieren jugar a ajedrez"
-            },
-            "uno": {
-                "nombre": "Torneo de UNO",
-                "descripcion": "Torneo del popular juego de cartas UNO",
-                "razon": "Para quienes prefieren la tranquilidad, juegos que no requieren tanto pensamiento y alejarse de las pantallas",
-                "tipo": "Juego de mesa casual",
-                "popularidad": "Sabemos que este juego de mesa es muy popular, así que sería un pecado omitirlo"
+  "metadata": {
+    "version": "1.1",
+    "organization": "Manos Unidas - Centro de Estudiantes",
+    "lastUpdated": "2026-10-19",
+    "language": "es"
+  },
+  "proyectos": [
+    {
+      "id": "torneos",
+      "nombre": "Torneos y Concursos",
+      "url": "concursos.html",
+      "descripcion": "Diversos torneos para todos los gustos: videojuegos, deportes y juegos de mesa. Organizados por estado: realizados, en proceso y en propuesta.",
+      "categorias": {
+        "realizados": {
+          "titulo": "Ya realizados",
+          "descripcion": "Torneos que ya fueron organizados y finalizados",
+          "torneos": [
+            {
+              "nombre": "Truco",
+              "emoji": "♦",
+              "descripcion": "Torneo de Truco que fomentó camaradería y astucia con este clásico infaltable. Ya fue realizado con éxito.",
+              "estado": "Finalizado"
             }
+          ]
         },
-        "inscripcion": "Puedes inscribirte a través del formulario de inscripción a torneos en la sección Forms de nuestra página web"
+        "en_proceso": {
+          "titulo": "Organizados o en proceso de organización",
+          "descripcion": "Torneos que estamos organizando o que tienen fecha confirmada",
+          "torneos": [
+            {
+              "nombre": "Minecraft",
+              "emoji": "⛏️",
+              "descripcion": "Concurso de construcción en servidor exclusivo basado en concursos de Globant. En proceso de organización.",
+              "objetivo": "Demostrar creatividad en construcción",
+              "estado": "En organización"
+            },
+            {
+              "nombre": "UNO",
+              "emoji": "🔴",
+              "descripcion": "Torneo de juego de mesa UNO para quienes prefieren tranquilidad sin pantallas. En proceso de organización.",
+              "nota": "Juego muy popular",
+              "estado": "En organización"
+            }
+          ]
+        },
+        "propuestos": {
+          "titulo": "En propuesta",
+          "descripcion": "Torneos que estaban en las propuestas iniciales pero no sabemos si vamos a poder realizar",
+          "torneos": [
+            {
+              "nombre": "Valorant",
+              "emoji": "🎯",
+              "descripcion": "Torneo de videojuego Valorant pensado para los amantes de la acción táctica. Solo propuesta, no confirmado.",
+              "nota": "No se realiza dentro de la institución",
+              "estado": "No confirmado"
+            },
+            {
+              "nombre": "Fútbol",
+              "emoji": "⚽",
+              "descripcion": "Torneo de fútbol en ambiente competitivo para todos los estudiantes. Solo propuesta, no confirmado.",
+              "nota": "Para quienes no les gustan videojuegos",
+              "estado": "No confirmado"
+            },
+            {
+              "nombre": "Ajedrez",
+              "emoji": "♟️",
+              "descripcion": "Torneo de ajedrez para estrategas que quieren poner a prueba su inteligencia. Solo propuesta, no confirmado.",
+              "objetivo": "Fomentar creatividad y habilidad",
+              "estado": "No confirmado"
+            }
+          ]
+        }
+      }
     },
-    
-    "correcaminatas": {
-        "nombre": "Correcaminatas",
-        "descripcion": "Eventos deportivos que consisten en transitar un sendero de determinada magnitud por las sierras de nuestra ciudad",
-        "modalidad": "Cada participante elige cómo recorrer el sendero: caminando o corriendo",
-        "objetivos": [
-            "Promover un estilo de vida saludable entre los estudiantes",
-            "Fomentar el trabajo en equipo y la solidaridad",
-            "Crear un espacio de recreación y diversión fuera del aula",
-            "Desarrollar una comunidad activa y diversa",
-            "Recaudar dinero mediante las entradas"
-        ],
-        "ubicacion": "Sierras de General Alvear, Buenos Aires",
-        "beneficio": "Aprovecha el paisaje natural de nuestra ciudad",
-        "participacion": "Evento abierto para todos los estudiantes"
-    },
-    
-    "podcast": {
-        "nombre": "Podcast Manos Unidas",
-        "descripcion": "Programa semanal realizado por Manos Unidas donde se invita a alumnos y profesores",
-        "frecuencia": "Los viernes",
-        "formato": "Entrevistas y conversaciones informales",
+    {
+      "id": "podcast",
+      "nombre": "Podcast Manos Unidas",
+      "url": "podcast.html",
+      "emoji": "🎙️",
+      "descripcion": "Programa que vamos a realizar los viernes con invitados especiales. Aún no lo hicimos pero lo estamos planeando.",
+      "estado": "En planificación",
+      "detalles": {
+        "frecuencia": "Semanalmente los viernes (planeado)",
+        "participantes": "Alumnos y profesores invitados",
         "temas": [
-            "Proyectos que están haciendo alumnos invitados",
-            "Información útil de profesores para alumnos",
-            "Vida escolar y novedades",
-            "Anuncios importantes"
+          "Proyectos de alumnos invitados",
+          "Consejos educativos de profesores",
+          "Vida escolar",
+          "Anuncios importantes"
         ],
+        "objetivo": "Crear una instancia de ida y vuelta activa entre alumnos y profesores, espacio para aprender"
+      }
+    },
+    {
+      "id": "correcaminatas",
+      "nombre": "Correcaminatas",
+      "url": "correcaminatas.html",
+      "emoji": "🏃",
+      "descripcion": "Eventos deportivos por las sierras de la ciudad promoviendo vida saludable. Creemos que no será posible realizarlas, pero sigue estando en nuestras propuestas.",
+      "estado": "Probablemente no se realice",
+      "detalles": {
+        "tipo": "Evento deportivo",
+        "ubicacion": "Sierras de la ciudad",
+        "actividades": ["Caminar", "Correr"],
         "objetivos": [
-            "Tener una instancia de ida y vuelta activo entre alumnos y profesores",
-            "Espacio para anunciar novedades",
-            "Puede servir para aprender de manera entretenida"
-        ],
-        "como_participar": "Si quieres ser invitado al podcast, contacta al Centro de Estudiantes a través del formulario de contacto"
-    },
-    
-    "proyecto_materiales": {
-        "nombre": "Proyecto Materiales",
-        "descripcion": "Sistema de inversión colaborativa para compra de materiales escolares compartidos",
-        "origen": "Basado en una idea que ya se implementó en 4to año",
-        "funcionamiento": "Cada delegado de curso pregunta qué materiales hacen falta y quiénes están dispuestos a invertir. Con el dinero recaudado (separado por salones) se compran materiales de uso compartido entre todos los inversores del salón",
-        "caracteristica": "Los materiales son de propiedad compartida entre los inversores de cada curso",
-        "beneficios": [
-            "Ahorro en compra de materiales",
-            "Acceso a materiales de mejor calidad",
-            "Fomenta la colaboración entre estudiantes",
-            "Uso responsable de recursos"
-        ],
-        "como_participar": "Habla con el delegado de tu curso para participar en la próxima compra colaborativa"
-    },
-    
-    "pared_creativa": {
-        "nombre": "Pared Creativa",
-        "tipo": "Proyecto a largo plazo",
-        "descripcion": "Creación de un espacio creativo donde cada estudiante puede dibujar o escribir lo que quiera",
-        "material": "Hecha de un material similar al plástico de un pizarrón, por tanto es borrable y muy cómodo de escribir",
-        "normas": "Todo contenido debe ser acorde al vocabulario y normas de la institución",
-        "importancia": "Permite la libertad creativa de los alumnos en un espacio físico dedicado",
-        "beneficios": [
-            "Espacio de expresión artística",
-            "Fomenta la creatividad",
-            "Contenido borrable permite renovación constante",
-            "Pertenece a toda la comunidad estudiantil"
-        ],
-        "estado": "Proyecto en planificación"
-    },
-    
-    "esencia": {
-        "nombre": "E.S.E.N.C.I.A",
-        "nombre_completo": "Proyecto de reforma educativa",
-        "que_es": "Proyecto que busca reformar ciertos aspectos del sistema de enseñanzas del colegio para hacerlo más flexible",
-        "objetivo": "Mejorar el sistema para que sea más flexible y poder realizar clases alternativas con otra trayectoria",
-        "aclaracion": "No significa que lo que se está haciendo esté mal, sino que se cree que el sistema puede mejorarse",
-        "beneficios": "Permitir diversos eventos y trayectorias educativas que actualmente el sistema rígido no permite",
-        "filosofia": "Creemos que el sistema educativo puede adaptarse mejor a las necesidades individuales de cada estudiante",
-        "areas_de_mejora": [
-            "Mayor flexibilidad en trayectorias educativas",
-            "Clases alternativas",
-            "Adaptación a diferentes estilos de aprendizaje",
-            "Sistema más dinámico"
+          "Promover estilo de vida saludable",
+          "Fomentar trabajo en equipo y solidaridad",
+          "Crear espacio de recreación fuera del aula",
+          "Desarrollar comunidad activa y diversa",
+          "Recaudar dinero mediante entradas"
         ]
+      }
     },
-    
-    "noticias_actuales": {
-        "concierto_segundo": {
-            "evento": "Concierto de Segundo Año",
-            "fecha": "13 de noviembre",
-            "lugar": "Macanudo",
-            "curso": "Segundo año",
-            "materia": "Música",
-            "entrada": "Al sobre",
-            "canciones": [
-                "Rincón",
-                "El Encanto",
-                "Par Mil",
-                "Only Girl",
-                "Cuando No Estás",
-                "Jardín Eléctrico",
-                "Chau"
-            ],
-            "descripcion": "Segundo año realizará un concierto desde la materia de música con 7 canciones increíbles"
-        }
-    },
-    
-    "beta_lab": {
-        "nombre": "Beta Lab",
-        "descripcion": "Laboratorio de experimentos donde se prueban nuevas funcionalidades antes de ser agregadas a la página principal",
-        "duracion": "Las funcionalidades permanecen un periodo de tiempo para obtener feedback",
-        "objetivo": "Decidir qué funcionalidades se agregan permanentemente según la utilidad y entretenimiento que aporten",
-        "como_participar": "Los usuarios pueden votar si una funcionalidad es útil o no, y dejar comentarios con sugerencias",
-        "experimentos_actuales": [
-            "Calendario de eventos",
-            "Sistema de puntos y logros",
-            "Marketplace escolar",
-            "Chat por curso",
-            "Biblioteca digital"
+    {
+      "id": "materiales",
+      "nombre": "Proyecto Materiales",
+      "url": "materiales.html",
+      "emoji": "📦",
+      "descripcion": "Proyecto mediante el cual se proveyó material artístico a cada salón (de 1ro a 5to año). El proyecto se terminó y ya compramos la segunda tanda de materiales.",
+      "estado": "Finalizado (segunda tanda comprada)",
+      "detalles": {
+        "origen": "Idea implementada en 4to año",
+        "alcance": "Salones de 1ro a 5to año",
+        "tipo_material": "Material artístico para cada salón",
+        "proceso": [
+          "Delegado pregunta qué materiales hace falta en el salón",
+          "Se identifica quiénes quieren invertir",
+          "Se recauda dinero separado por salones",
+          "Se compran materiales artísticos",
+          "Uso compartido entre todos los inversores del salón"
         ],
-        "importancia": "Tu opinión determina qué funcionalidades se quedan en la plataforma"
+        "beneficio": "Todos los salones de 1ro a 5to cuentan con material artístico de calidad compartido",
+        "tanda_actual": "Segunda tanda ya comprada"
+      }
     },
-    
-    "sistema_cuentas": {
-        "nombre": "Sistema de Cuentas",
-        "funcionalidad": "Sistema de registro e inicio de sesión para acceso a funcionalidades exclusivas",
-        "beneficios": [
-            "Votar en experimentos del Beta Lab",
-            "Enviar formularios y propuestas",
-            "Participar en encuestas",
-            "Inscribirse a torneos",
-            "Personalizar tu experiencia"
-        ],
-        "seguridad": "Tus datos están protegidos con encriptación y tokens JWT",
-        "como_registrarse": "Haz clic en 'Registrarse' en la parte superior de la página y completa tus datos"
+    {
+      "id": "pared-creativa",
+      "nombre": "Pared Creativa",
+      "url": "pared-creativa.html",
+      "emoji": "🎨",
+      "descripcion": "Espacio creativo compartido para expresión artística de toda la comunidad. Aún no lo hicimos pero lo estamos planeando.",
+      "estado": "En planificación",
+      "detalles": {
+        "tipo": "Proyecto a largo plazo (planeado)",
+        "material": "Similar a pizarrón plástico - borrable y cómodo",
+        "normas": "Acorde al vocabulario e institucionales",
+        "importancia": "Permite libertad creativa de los alumnos"
+      }
     },
-    
-    "formularios_disponibles": {
-        "propuesta_proyecto": {
-            "nombre": "Propuesta de Proyecto",
-            "descripcion": "Para enviar ideas innovadoras al Centro de Estudiantes",
-            "cuando_usar": "Cuando tengas una idea que pueda mejorar la vida escolar"
-        },
-        "sugerencias": {
-            "nombre": "Sugerencias",
-            "descripcion": "Para ayudar a mejorar el Centro de Estudiantes",
-            "cuando_usar": "Cuando tengas feedback constructivo sobre nuestras propuestas o funcionamiento"
-        },
-        "reportar_problema": {
-            "nombre": "Reportar Problema",
-            "descripcion": "Para informar errores en la web o servicios",
-            "cuando_usar": "Si encuentras algún error técnico o funcionalidad que no trabaja correctamente"
-        },
-        "inscripcion_torneo": {
-            "nombre": "Inscripción a Torneos",
-            "descripcion": "Para registrarse en concursos y torneos",
-            "cuando_usar": "Cuando quieras participar en alguno de nuestros torneos"
-        },
-        "feedback_sivia": {
-            "nombre": "Feedback SIVIA",
-            "descripcion": "Para ayudar a mejorar mi funcionamiento",
-            "cuando_usar": "Si tienes sugerencias sobre cómo puedo ayudarte mejor"
-        },
-        "contacto_ce": {
-            "nombre": "Contacto Centro de Estudiantes",
-            "descripcion": "Para enviar mensajes directos al CE",
-            "cuando_usar": "Para cualquier consulta o comunicación con el Centro de Estudiantes"
-        }
-    },
-    
-    "sobre_sivia": {
-        "nombre": "S.I.V.I.A",
-        "nombre_completo": "Sistema de Innovación Virtual con Inteligencia Aplicada",
-        "que_soy": "Soy una asistente virtual creada para ayudar a la comunidad de Manos Unidas",
-        "personalidad": [
-            "Amigable y empática",
-            "Profesional y clara",
-            "Comprometida con ayudar a todos los usuarios"
-        ],
-        "capacidades": [
-            "Responder preguntas sobre propuestas y eventos de Manos Unidas",
-            "Buscar información en la web cuando sea necesario",
-            "Ayudar con dudas sobre el Centro de Estudiantes",
-            "Proporcionar información actualizada sobre torneos y actividades",
-            "Explicar el funcionamiento de la plataforma"
-        ],
-        "tecnologia": "Funciono con Google Gemini AI y tengo acceso a búsqueda web",
-        "disponibilidad": "Estoy disponible 24/7 para ayudarte",
-        "ventana_flotante": "Puedes abrir una ventana flotante conmigo presionando Ctrl+K o haciendo clic en el botón de ventana. Así puedes chatear mientras navegas otras páginas",
-        "como_usar": [
-            "Escribe tu pregunta en lenguaje natural",
-            "Si necesito buscar información actualizada, lo haré automáticamente",
-            "Puedes pedirme que busque en la web escribiendo 'buscar web sobre [tema]'",
-            "Usa las sugerencias rápidas si no sabes qué preguntar"
-        ]
-    },
-    
-    "preguntas_frecuentes": {
-        "cuando_votaciones": "Las votaciones se realizan el 4 de noviembre de 2024",
-        "como_participar_torneos": "Puedes inscribirte a través del formulario de inscripción a torneos en la sección Forms",
-        "que_es_manos_unidas": "Manos Unidas es una lista del Centro de Estudiantes comprometida con mejorar la experiencia educativa y crear una comunidad estudiantil activa",
-        "como_contactar_ce": "Puedes contactarnos a través del formulario de Contacto CE en la sección Forms, o hablando directamente conmigo",
-        "puedo_proponer_ideas": "¡Sí! Usa el formulario de Propuesta de Proyecto para compartir tus ideas innovadoras",
-        "como_funciona_beta_lab": "Beta Lab es un espacio donde puedes probar y votar sobre nuevas funcionalidades antes de que sean agregadas permanentemente",
-        "necesito_cuenta": "Sí, necesitas crear una cuenta para acceder a funcionalidades como votar en Beta Lab, inscribirte a torneos y enviar formularios"
-    },
-    
-    "contacto_ayuda": {
-        "para_dudas": "Puedes preguntarme directamente o usar el formulario de Contacto CE",
-        "para_propuestas": "Usa el formulario de Propuesta de Proyecto en la sección Forms",
-        "para_problemas": "Usa el formulario de Reportar Problema",
-        "para_torneos": "Usa el formulario de Inscripción a Torneos",
-        "horario_atencion": "Estoy disponible 24/7, pero el Centro de Estudiantes responde durante el horario escolar"
-    },
-    
-    "ubicacion": {
-        "ciudad": "General Alvear",
-        "provincia": "Buenos Aires",
-        "pais": "Argentina",
-        "contexto": "Aprovechamos el paisaje natural de nuestras sierras para eventos como las correcaminatas"
-    },
-    
-    "cultura_escolar": {
-        "valores": "Participación, innovación, comunidad y transparencia",
-        "objetivo": "Crear una comunidad estudiantil activa donde todos tengan voz",
-        "filosofia": "Creemos que la educación puede ser más flexible, participativa y adaptada a cada estudiante"
-    },
-    
-    "proximos_eventos": {
-        "votaciones_ce": "4 de noviembre de 2024",
-        "concierto_segundo": "13 de noviembre en Macanudo"
+    {
+      "id": "esencia",
+      "nombre": "E.S.E.N.C.I.A",
+      "url": "esencia.html",
+      "emoji": "📚",
+      "descripcion": "Reforma del sistema educativo para mayor flexibilidad y modernización. Aún no lo implementamos pero lo estamos planeando.",
+      "estado": "En planificación",
+      "detalles": {
+        "tipo": "Propuesta de reforma educativa",
+        "objetivo": "Hacer el sistema educativo más flexible"
+      }
     }
+  ],
+  "formularios": [
+    {
+      "id": "sugerencia",
+      "nombre": "Sugerencias",
+      "emoji": "✏️",
+      "descripcion": "Proponé algo: ideas, proyectos, actividades o cualquier propuesta para el Centro de Estudiantes",
+      "campos": ["nombre", "email", "mensaje"]
+    },
+    {
+      "id": "problema",
+      "nombre": "Reportar Problema",
+      "emoji": "⚠️",
+      "descripcion": "Avisanos de problemas que el Centro de Estudiantes pueda solucionar",
+      "campos": ["nombre", "email", "mensaje"]
+    },
+    {
+      "id": "sivia",
+      "nombre": "Feedback SIVIA",
+      "emoji": "🤖",
+      "descripcion": "Reportá o comunicá algo en relación a SIVIA (bugs, sugerencias, mejoras, etc.)",
+      "campos": ["nombre", "email", "mensaje"]
+    }
+  ],
+  "preguntas_frecuentes": [
+    {
+      "pregunta": "¿Qué es Manos Unidas?",
+      "respuesta": "Manos Unidas es el Centro de Estudiantes que desarrolla proyectos innovadores para mejorar la experiencia escolar. Somos un espacio colaborativo donde estudiantes pueden proponer, organizar y participar en iniciativas educativas, recreativas y solidarias."
+    },
+    {
+      "pregunta": "¿Cuáles son los torneos disponibles?",
+      "respuesta": "Los torneos se dividen en tres categorías:\n\n1. Ya realizados: Truco (♦) — finalizado con éxito.\n\n2. En organización: Minecraft (⛏️) y UNO (🔴) — están siendo organizados.\n\n3. En propuesta (no confirmados): Valorant (🎯), Fútbol (⚽) y Ajedrez (♟️) — estaban en las propuestas iniciales pero no sabemos si vamos a poder realizarlos."
+    },
+    {
+      "pregunta": "¿El torneo de Truco ya se hizo?",
+      "respuesta": "Sí, el torneo de Truco ya fue realizado y finalizado con éxito. Fue una buena instancia para fomentar camaradería y astucia entre los participantes."
+    },
+    {
+      "pregunta": "¿Qué torneos están en proceso de organización?",
+      "respuesta": "Actualmente estamos organizando dos torneos: Minecraft (⛏️), un concurso de construcción en servidor exclusivo basado en concursos de Globant, y UNO (🔴), para quienes prefieren tranquilidad sin pantallas."
+    },
+    {
+      "pregunta": "¿Van a hacer los torneos de Valorant, Fútbol y Ajedrez?",
+      "respuesta": "Esos torneos estaban en las propuestas iniciales pero no sabemos si los vamos a poder realizar. Están en la categoría de 'En propuesta' hasta que confirmemos si es factible organizarlos."
+    },
+    {
+      "pregunta": "¿Cuándo es el podcast?",
+      "respuesta": "El podcast de Manos Unidas está planeado para transmitirse todos los viernes, pero aún no lo hemos hecho. Lo estamos planeando. En él vamos a invitar a alumnos y profesores para hablar de proyectos, consejos educativos y vida escolar."
+    },
+    {
+      "pregunta": "¿Qué es E.S.E.N.C.I.A?",
+      "respuesta": "E.S.E.N.C.I.A es una propuesta de reforma del sistema educativo que buscamos implementar para hacerlo más flexible y adaptado a las necesidades de los estudiantes actuales. Aún no lo implementamos pero lo estamos planeando."
+    },
+    {
+      "pregunta": "¿Cómo participo en el Proyecto Materiales?",
+      "respuesta": "El Proyecto Materiales ya se terminó: se proveyó material artístico a cada salón de 1ro a 5to año, y ya compramos la segunda tanda de materiales. Tu delegado de curso fue el encargado de preguntar qué materiales necesitaban, identificar quiénes querían invertir, recaudar el dinero y comprar los materiales artísticos para uso compartido entre todos los inversores del salón."
+    },
+    {
+      "pregunta": "¿El Proyecto Materiales sigue activo?",
+      "respuesta": "El proyecto se terminó y ya compramos la segunda tanda de materiales artísticos. Todos los salones de 1ro a 5to año cuentan con material de calidad compartido."
+    },
+    {
+      "pregunta": "¿Dónde es la Pared Creativa?",
+      "respuesta": "La Pared Creativa es un espacio de expresión dentro de la institución que estamos planeando implementar. Será un pizarrón borrable donde todos puedan dibujar y escribir, respetando las normas escolares. Aún no está implementada."
+    },
+    {
+      "pregunta": "¿Qué son las Correcaminatas?",
+      "respuesta": "Son eventos deportivos propuestos para hacer por las sierras de la ciudad, donde se puede caminar o correr según el ritmo de cada uno. El objetivo era promover vida saludable, solidaridad y recaudar dinero. Sin embargo, creemos que no será posible realizarlas, aunque sigue estando en nuestras propuestas."
+    },
+    {
+      "pregunta": "¿Las Correcaminatas se van a hacer?",
+      "respuesta": "Creemos que no será posible realizar las Correcaminatas, aunque sigue estando dentro de nuestras propuestas. Si llegamos a organizarlas en el futuro, se informará por los canales oficiales."
+    },
+    {
+      "pregunta": "¿Cómo puedo enviar una propuesta?",
+      "respuesta": "Ve a la sección Formularios y selecciona 'Sugerencias'. Completa el formulario con tu idea y nos la revisaremos pronto."
+    },
+    {
+      "pregunta": "¿Cómo reporto un problema?",
+      "respuesta": "Usá el formulario 'Reportar Problema' en la sección Formularios. Está pensado para que nos avises de problemas que el Centro de Estudiantes pueda solucionar."
+    },
+    {
+      "pregunta": "¿Cómo contacto al Centro de Estudiantes?",
+      "respuesta": "Podés usar el formulario de 'Sugerencias' en la sección Formularios para comunicarte con el Centro de Estudiantes. También podés presentar tus ideas en las asambleas estudiantiles."
+    },
+    {
+      "pregunta": "¿Qué formularios hay disponibles?",
+      "respuesta": "Actualmente hay 3 formularios:\n\n1. Sugerencias (✏️): para proponer algo — ideas, proyectos, actividades o cualquier propuesta.\n\n2. Reportar Problema (⚠️): para avisar de problemas que el Centro de Estudiantes pueda solucionar.\n\n3. Feedback SIVIA (🤖): para reportar o comunicar algo en relación a SIVIA (bugs, sugerencias, mejoras)."
+    },
+    {
+      "pregunta": "¿Cómo doy feedback sobre SIVIA?",
+      "respuesta": "Usá el formulario 'Feedback SIVIA' en la sección Formularios. Está pensado para que reportes o comuniques algo en relación a SIVIA: bugs que encuentres, sugerencias de mejora, o cualquier comentario sobre tu experiencia con la IA."
+    },
+    {
+      "pregunta": "¿Quién es SIVIA?",
+      "respuesta": "Soy SIVIA, tu asistente de Manos Unidas. Estoy aquí para responder todas tus preguntas sobre los proyectos, torneos, formularios y cualquier cosa relacionada con el Centro de Estudiantes."
+    }
+  ],
+  "contacto": {
+    "nombre_organizacion": "Manos Unidas - Centro de Estudiantes",
+    "email": "contacto@manosunidas.edu.ar",
+    "redes_sociales": {
+      "instagram": "@manosunidas_ce",
+      "twitter": "@manosunidas"
+    },
+    "ubicacion": "Institución educativa"
+  },
+  "navegacion": [
+    {
+      "pagina": "Inicio",
+      "url": "index.html",
+      "descripcion": "Página principal con todas nuestras propuestas"
+    },
+    {
+      "pagina": "SIVIA",
+      "url": "sivia.html",
+      "descripcion": "Chat con asistente de IA SIVIA"
+    },
+    {
+      "pagina": "Torneos",
+      "url": "concursos.html",
+      "descripcion": "Ver todos los torneos disponibles organizados por estado"
+    },
+    {
+      "pagina": "Beta Lab",
+      "url": "beta-lab.html",
+      "descripcion": "Nuevas funcionalidades en prueba"
+    },
+    {
+      "pagina": "Formularios",
+      "url": "forms.html",
+      "descripcion": "Enviar sugerencias, reportar problemas o dar feedback sobre SIVIA"
+    }
+  ]
 }

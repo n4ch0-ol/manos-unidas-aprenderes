@@ -383,6 +383,42 @@
             transform: none;
         }
 
+        /* Botón STOP (visible durante la generación) */
+        .stop-btn {
+            background: rgba(239, 68, 68, 0.18);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            animation: stopPulse 1.6s ease-in-out infinite;
+        }
+        .stop-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+            color: #fecaca;
+            transform: scale(1.05);
+        }
+        .stop-btn .material-icons-round {
+            font-size: 18px;
+        }
+
+        @keyframes stopPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50%      { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+
+        .stop-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+        .stop-indicator::before {
+            content: '■';
+            color: #ef4444;
+            font-size: 9px;
+        }
+
         .main-input {
             flex: 1;
             background: transparent;
@@ -460,7 +496,9 @@
                 <g id="orb-nodes"></g>
             </svg>
         </div>
-        <div class="thinking-label">Pensando<span class="dots"></span></div>
+        <div class="thinking-label">
+            <span id="thinking-status-text">Pensando</span><span class="dots"></span>
+        </div>
     </div>
 
     <div class="input-wrapper">
@@ -472,18 +510,35 @@
 
             <input type="text" class="main-input" id="user-input" placeholder="Escribe un mensaje a SIVIA..." autocomplete="off">
 
-            <button class="send-btn" id="send-btn" onclick="handleSend()" title="Enviar">
-                <span class="material-icons-round">send</span>
+            <button class="send-btn" id="send-btn" onclick="handleSendClick()" title="Enviar">
+                <span class="material-icons-round" id="send-icon">send</span>
             </button>
         </div>
         <div class="footer-note">SIVIA puede cometer errores. Verifica la información importante.</div>
     </div>
 
     <script>
-        const API_URL = "https://sivia-backend.onrender.com/chat";
+        const API_URL = "https://sivia-backend.onrender.com/chat/stream";
+        const API_URL_FALLBACK = "https://sivia-backend.onrender.com/chat";
         const LOGO_PATH = "images/sivia recuadro derecho.png";
 
         let currentImageBase64 = null;
+
+        // --- FASES DE RESPALDO (si el modelo no emite reasoning_content) ---
+        // Se activan por tiempo. Si llega un status real, se reemplazan.
+        const FALLBACK_PHASES = [
+            { delay: 0,    label: "Pensando" },
+            { delay: 1500, label: "Analizando contexto" },
+            { delay: 3500, label: "Procesando información" },
+            { delay: 6000, label: "Formulando respuesta" },
+            { delay: 9000, label: "Puliendo detalles" }
+        ];
+
+        // --- ESTADO GLOBAL DEL STREAMING ---
+        let isGenerating = false;
+        let currentAbortController = null;
+        let currentBotBubble = null;
+        let currentAnswerText = '';
 
         // --- ESFERA DE ORBES CON LÍNEAS (estilo molecular) ---
         // Puntos distribuidos con fibonacci en esfera 3D.
@@ -639,15 +694,52 @@
         });
 
         // --- THINKING INDICATOR ---
+        let fallbackTimer = null;
+        let fallbackIdx = 0;
+
+        function setThinkingStatus(text) {
+            const el = document.getElementById('thinking-status-text');
+            if (el) el.textContent = text;
+        }
+
+        function startFallbackPhases() {
+            fallbackIdx = 0;
+            setThinkingStatus(FALLBACK_PHASES[0].label);
+            let elapsed = 0;
+            fallbackTimer = setInterval(() => {
+                elapsed += 500;
+                for (let i = FALLBACK_PHASES.length - 1; i >= 0; i--) {
+                    if (elapsed >= FALLBACK_PHASES[i].delay) {
+                        if (i !== fallbackIdx) {
+                            fallbackIdx = i;
+                            // Solo cambiamos si no llegó un status real todavía
+                            // (el status real sobreescribe vía setThinkingStatus)
+                            setThinkingStatus(FALLBACK_PHASES[i].label);
+                        }
+                        break;
+                    }
+                }
+            }, 500);
+        }
+
+        function stopFallbackPhases() {
+            if (fallbackTimer) {
+                clearInterval(fallbackTimer);
+                fallbackTimer = null;
+            }
+        }
+
         function startThinking() {
             document.getElementById('thinking-indicator').classList.add('active');
             startOrbsAnim();
+            startFallbackPhases();
             scrollToBottom();
         }
 
         function stopThinking() {
             document.getElementById('thinking-indicator').classList.remove('active');
             stopOrbsAnim();
+            stopFallbackPhases();
         }
 
         // --- ADD MESSAGE ---
@@ -689,8 +781,66 @@
             container.appendChild(msgDiv);
             scrollToBottom();
         }
+                // --- LÓGICA DE ENVÍO (STREAMING SSE) ---
+        function handleSendClick() {
+            // Si está generando, el botón actúa como STOP
+            if (isGenerating) {
+                stopGeneration();
+                return;
+            }
+            handleSend();
+        }
 
-        // --- LÓGICA DE ENVÍO ---
+        function setGeneratingState(generating) {
+            isGenerating = generating;
+            const btn = document.getElementById('send-btn');
+            const icon = document.getElementById('send-icon');
+            const input = document.getElementById('user-input');
+            if (generating) {
+                btn.classList.add('stop-btn');
+                btn.classList.remove('send-btn');
+                btn.title = 'Detener';
+                icon.textContent = 'stop';
+                input.disabled = false; // dejamos escribir mientras genera
+            } else {
+                btn.classList.remove('stop-btn');
+                btn.classList.add('send-btn');
+                btn.title = 'Enviar';
+                icon.textContent = 'send';
+                btn.disabled = false;
+                input.disabled = false;
+            }
+        }
+
+        function stopGeneration() {
+            if (currentAbortController) {
+                currentAbortController.abort();
+                currentAbortController = null;
+            }
+            stopThinking();
+            // Dejar la respuesta parcial escrita + indicador de detención
+            if (currentBotBubble && currentAnswerText) {
+                appendStopIndicator(currentBotBubble);
+            } else if (currentBotBubble) {
+                // Si no llegó ni un chunk, sacamos la burbuja vacía
+                removeBotBubble(currentBotBubble);
+                addMessage("⏹️ Generación detenida por el usuario.", 'bot');
+            }
+            setGeneratingState(false);
+            currentBotBubble = null;
+            currentAnswerText = '';
+            document.getElementById('user-input').focus();
+        }
+
+        function appendStopIndicator(msgDiv) {
+            const content = msgDiv.querySelector('.content');
+            if (!content || content.querySelector('.stop-indicator')) return;
+            const ind = document.createElement('div');
+            ind.className = 'stop-indicator';
+            ind.textContent = 'Detenido';
+            content.appendChild(ind);
+        }
+
         async function handleSend() {
             const input = document.getElementById('user-input');
             const text = input.value.trim();
@@ -698,15 +848,22 @@
 
             if (!text && !currentImageBase64) return;
 
+            // Si ya está generando, no hace nada (el click lo maneja stopGeneration)
+            if (isGenerating) return;
+
             addMessage(text, 'user', currentImageBase64);
 
             input.value = '';
-            input.disabled = true;
-            btn.disabled = true;
             document.getElementById('clip-btn').classList.remove('has-file');
             document.getElementById('file-upload').value = '';
 
             startThinking();
+            setGeneratingState(true);
+
+            // Crear burbuja de respuesta vacía para ir llenándola con los chunks
+            currentBotBubble = createEmptyBotBubble();
+            currentAnswerText = '';
+            currentAbortController = new AbortController();
 
             try {
                 const response = await fetch(API_URL, {
@@ -715,28 +872,164 @@
                     body: JSON.stringify({
                         question: text,
                         image: currentImageBase64
-                    })
+                    }),
+                    signal: currentAbortController.signal
                 });
 
-                const data = await response.json();
-                stopThinking();
-                addMessage(data.answer || 'Sin respuesta del servidor.', 'bot');
+                if (!response.ok || !response.body) {
+                    throw new Error('Respuesta no válida del servidor');
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let firstChunkArrived = false;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+
+                    // Los eventos SSE vienen separados por doble salto de línea
+                    const events = buffer.split('\n\n');
+                    buffer = events.pop(); // mantener incompleto
+
+                    for (const evt of events) {
+                        const lines = evt.split('\n');
+                        let eventType = 'message';
+                        let dataStr = '';
+                        for (const line of lines) {
+                            if (line.startsWith('event: ')) eventType = line.substring(7).trim();
+                            else if (line.startsWith('data: ')) dataStr = line.substring(6);
+                        }
+                        if (!dataStr) continue;
+
+                        let data;
+                        try { data = JSON.parse(dataStr); }
+                        catch { continue; }
+
+                        if (eventType === 'status') {
+                            // Status real del razonamiento del modelo → pisa las fases
+                            stopFallbackPhases();
+                            setThinkingStatus(data.text);
+                        } else if (eventType === 'chunk') {
+                            // Llegó un fragmento de respuesta → mostrarlo
+                            if (!firstChunkArrived) {
+                                firstChunkArrived = true;
+                                stopThinking();
+                                showBotBubble(currentBotBubble);
+                            }
+                            currentAnswerText += data.text;
+                            updateBotBubble(currentBotBubble, currentAnswerText);
+                        } else if (eventType === 'done') {
+                            if (!firstChunkArrived) {
+                                stopThinking();
+                                showBotBubble(currentBotBubble);
+                                updateBotBubble(currentBotBubble, currentAnswerText || '(Sin respuesta)');
+                            }
+                            break;
+                        } else if (eventType === 'error') {
+                            stopThinking();
+                            removeBotBubble(currentBotBubble);
+                            addMessage("⚠️ " + (data.message || 'Error del servidor.'), 'bot');
+                            break;
+                        }
+                    }
+                }
+
+                // Limpieza post-stream exitoso
+                currentAbortController = null;
+                if (isGenerating) {
+                    setGeneratingState(false);
+                }
 
             } catch (error) {
-                stopThinking();
-                addMessage("⚠️ Error de conexión. El servidor puede estar 'durmiendo' (espera 30s) o no tienes internet.", 'bot');
-            }
+                currentAbortController = null;
 
-            currentImageBase64 = null;
-            input.disabled = false;
-            btn.disabled = false;
-            input.focus();
+                // Si fue cancelado por el usuario, no hacer nada extra (stopGeneration ya manejó)
+                if (error.name === 'AbortError') {
+                    // Ya manejado por stopGeneration()
+                    return;
+                }
+
+                stopThinking();
+                removeBotBubble(currentBotBubble);
+                setGeneratingState(false);
+
+                // Fallback al endpoint no-streaming si el streaming falla por otra razón
+                try {
+                    const fb = await fetch(API_URL_FALLBACK, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question: text, image: currentImageBase64 })
+                    });
+                    const d = await fb.json();
+                    addMessage(d.answer || 'Sin respuesta del servidor.', 'bot');
+                } catch (e2) {
+                    addMessage("⚠️ Error de conexión. El servidor puede estar 'durmiendo' (espera 30s) o no tienes internet.", 'bot');
+                }
+            } finally {
+                currentBotBubble = null;
+                currentAnswerText = '';
+                currentImageBase64 = null;
+                document.getElementById('user-input').focus();
+                scrollToBottom();
+            }
+        }
+
+        // --- HELPERS PARA LA BURBUJA DE RESPUESTA STREAMING ---
+        function createEmptyBotBubble() {
+            const container = document.getElementById('chat-stream');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message bot';
+            msgDiv.style.display = 'none'; // oculta hasta que llegue el primer chunk
+            msgDiv.innerHTML = `
+                <div class="avatar bot"><img src="${LOGO_PATH}" alt="SIVIA"></div>
+                <div class="content">
+                    <div class="user-name">SIVIA</div>
+                    <div class="text-bubble"></div>
+                </div>
+            `;
+            container.appendChild(msgDiv);
+            return msgDiv;
+        }
+
+        function showBotBubble(msgDiv) {
+            msgDiv.style.display = '';
+            scrollToBottom();
+        }
+
+        function removeBotBubble(msgDiv) {
+            if (msgDiv && msgDiv.parentNode) {
+                msgDiv.parentNode.removeChild(msgDiv);
+            }
+        }
+
+        function updateBotBubble(msgDiv, rawText) {
+            const bubble = msgDiv.querySelector('.text-bubble');
+            if (!bubble) return;
+            // Markdown muy básico para la respuesta en streaming
+            let html = rawText
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+            bubble.innerHTML = html;
             scrollToBottom();
         }
 
         // --- EVENTS ---
         document.getElementById('user-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleSend();
+            if (e.key === 'Enter') {
+                if (isGenerating) {
+                    // Si está generando, Enter también detiene (como ChatGPT)
+                    stopGeneration();
+                } else {
+                    handleSend();
+                }
+            }
         });
         document.getElementById('user-input').focus();
     </script>

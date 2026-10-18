@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from dotenv import load_dotenv
 load_dotenv()
@@ -9,27 +9,20 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# --- PROVEEDORES GRATIS ---
-# Z.AI es prioridad 1 (gratis para siempre, sin tarjeta, probado que anda)
+# --- PROVEEDORES ---
 ZAI_API_KEY = os.getenv("ZAI_API_KEY")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 CF_API_TOKEN = os.getenv("CF_API_TOKEN")
 CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID")
-
-# Modelo de Z.ai ya verificado que funciona con tu API key
 ZAI_MODEL = os.getenv("ZAI_MODEL", "glm-4.6v-flash")
 
 MODELS_TO_TRY = []
-
-# 1) Z.AI / Zhipu — gratis para siempre
 if ZAI_API_KEY:
     MODELS_TO_TRY.append((
         "https://api.z.ai/api/paas/v4/chat/completions",
         ZAI_API_KEY,
         ZAI_MODEL
     ))
-
-# 2) GitHub Models (fallback)
 if GITHUB_TOKEN:
     MODELS_TO_TRY.append((
         "https://models.github.ai/inference/chat/completions",
@@ -41,8 +34,6 @@ if GITHUB_TOKEN:
         GITHUB_TOKEN,
         "meta/Llama-3.3-70B-Instruct"
     ))
-
-# 3) Cloudflare Workers AI (fallback)
 if CF_API_TOKEN and CF_ACCOUNT_ID:
     MODELS_TO_TRY.append((
         f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/v1/chat/completions",
@@ -50,7 +41,7 @@ if CF_API_TOKEN and CF_ACCOUNT_ID:
         "@cf/meta/llama-3.1-8b-instruct"
     ))
 
-# BASE DE DATOS LOCAL
+# --- BASE DE DATOS LOCAL ---
 try:
     with open('knowledge_base.json', 'r', encoding='utf-8') as file:
         data = json.load(file)
@@ -70,6 +61,54 @@ Eres SIVIA, la IA del Centro de Estudiantes.
 3. Si no tenés información específica, dilo claramente. No inventes.
 4. Respondé de forma concisa, amigable y clara.
 """
+
+# --- MAPEO RAZONAMIENTO CHINO → ESPAÑOL ---
+# Z.ai emite reasoning_content en chino. Detectamos keywords y mostramos
+# un status legible al usuario, estilo Gemini.
+STATUS_PATTERNS = [
+    ("用户",   "Entendiendo tu consulta"),
+    ("问题",   "Analizando tu pregunta"),
+    ("理解",   "Interpretando el mensaje"),
+    ("分析",   "Analizando el contexto"),
+    ("搜索",   "Buscando información"),
+    ("查找",   "Localizando datos"),
+    ("检查",   "Verificando detalles"),
+    ("数据库", "Consultando base de datos"),
+    ("上下文", "Revisando el contexto"),
+    ("组织",   "Organizando la respuesta"),
+    ("回答",   "Formulando respuesta"),
+    ("总结",   "Resumiendo"),
+    ("思考",   "Pensando"),
+    ("根据",   "Evaluando opciones"),
+    ("首先",   "Estructurando ideas"),
+    ("需要",   "Identificando necesidades"),
+    ("考虑",   "Considerando enfoques"),
+    ("计算",   "Calculando"),
+    ("对比",   "Comparando alternativas"),
+    ("确认",   "Confirmando detalles"),
+    ("准备",   "Preparando la respuesta"),
+    ("生成",   "Generando respuesta"),
+    ("引用",   "Citando fuentes"),
+    ("翻译",   "Procesando lenguaje"),
+    ("语言",   "Ajustando el tono"),
+    ("格式",   "Dando formato"),
+    ("安全",   "Revisando contenido"),
+    ("意图",   "Detectando intención"),
+    ("知识",   "Accediendo a conocimientos"),
+]
+
+
+def detect_status(reasoning_chunk):
+    """Devuelve un status en español basado en keywords chinos del reasoning."""
+    for keyword, label in STATUS_PATTERNS:
+        if keyword in reasoning_chunk:
+            return label
+    return None
+
+
+def sse_event(event, data):
+    """Formatea un evento SSE (Server-Sent Event)."""
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
 def web_search(query):
@@ -96,6 +135,24 @@ def web_search(query):
         return "Error al conectar con el motor de búsqueda."
 
 
+def build_messages(user_msg):
+    msg_content = user_msg
+    lowered = user_msg.lower()
+    triggers = ["busca web", "buscar web", "search web", "buscame", "buscá", "busca sobre"]
+    if any(t in lowered for t in triggers):
+        query = user_msg
+        for t in triggers:
+            query = query.replace(t, "")
+        result = web_search(query.strip())
+        msg_content = (f"El usuario pidió buscar en la web sobre: '{query.strip()}'. "
+                       f"Resultados obtenidos:\n{result}\n\n"
+                       f"Responde al usuario basándote en estos resultados. Si no encontraste nada útil, dilo.")
+    return [
+        {"role": "system", "content": SYSTEM_INSTRUCTION},
+        {"role": "user", "content": msg_content}
+    ]
+
+
 def call_model(endpoint, api_key, model, messages):
     if not api_key:
         return None, "API key no configurada"
@@ -104,7 +161,6 @@ def call_model(endpoint, api_key, model, messages):
         "messages": messages,
         "max_tokens": 1024,
         "temperature": 0.7,
-        # Desactivar razonamiento interno de GLM (responde más rápido y gasta menos tokens)
         "thinking": {"type": "disabled"}
     }
     try:
@@ -130,45 +186,24 @@ def call_model(endpoint, api_key, model, messages):
 
 @app.route('/', methods=['GET'])
 def home():
-    return "SIVIA ONLINE - Z.AI (gratis) + GitHub Models + Cloudflare"
+    return "SIVIA ONLINE - Z.AI streaming + fallback"
 
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    """Endpoint NO streaming (fallback)."""
     if not MODELS_TO_TRY:
-        return jsonify({"answer": "Error: configurá al menos ZAI_API_KEY en las variables de entorno de Render."}), 500
-
+        return jsonify({"answer": "Error: configurá al menos ZAI_API_KEY."}), 500
     try:
         data = request.get_json(silent=True)
         if not data:
-            return jsonify({"answer": "Petición no válida (no se recibió JSON)."}), 400
+            return jsonify({"answer": "Petición no válida."}), 400
         user_msg = data.get("question")
         if not user_msg:
             return jsonify({"answer": "Por favor, escribe una pregunta."}), 400
-
-        # Estos modelos de texto no procesan imágenes
         if data.get("image"):
-            return jsonify({
-                "answer": "Por ahora solo puedo leer texto. La función de imágenes está en mantenimiento."
-            }), 400
-
-        msg_content = user_msg
-        lowered = user_msg.lower()
-        triggers = ["busca web", "buscar web", "search web", "buscame", "buscá", "busca sobre"]
-        if any(t in lowered for t in triggers):
-            query = user_msg
-            for t in triggers:
-                query = query.replace(t, "")
-            result = web_search(query.strip())
-            msg_content = (f"El usuario pidió buscar en la web sobre: '{query.strip()}'. "
-                           f"Resultados obtenidos:\n{result}\n\n"
-                           f"Responde al usuario basándote en estos resultados. Si no encontraste nada útil, dilo.")
-
-        messages = [
-            {"role": "system", "content": SYSTEM_INSTRUCTION},
-            {"role": "user", "content": msg_content}
-        ]
-
+            return jsonify({"answer": "Por ahora solo puedo leer texto."}), 400
+        messages = build_messages(user_msg)
         last_error = ""
         for endpoint, key, model in MODELS_TO_TRY:
             print(f"📡 Probando modelo {model}...")
@@ -177,7 +212,6 @@ def chat():
                 return jsonify({"answer": answer, "model": model})
             print(f"❌ {error}")
             last_error = error or last_error
-
         return jsonify({
             "answer": "Lo siento, estoy sin cupo disponible por ahora. Probá de nuevo en unos minutos.",
             "details": last_error
@@ -185,6 +219,121 @@ def chat():
     except Exception as e:
         print(f"❌ ERROR SERVIDOR: {e}")
         return jsonify({"answer": "Error interno del servidor."}), 500
+
+
+# --- ENDPOINT STREAMING (SSE) ---
+# Emite eventos al frontend:
+#  - status: {text: "..."}     → estado actual del razonamiento del modelo
+#  - chunk:  {text: "..."}     → fragmento de la respuesta final (va llegando token por token)
+#  - done:   {}                → terminó OK
+#  - error:  {message: "..."}  → error
+@app.route('/chat/stream', methods=['POST'])
+def chat_stream():
+    if not ZAI_API_KEY:
+        return jsonify({"answer": "Error: ZAI_API_KEY no configurada."}), 500
+
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({"answer": "Petición no válida."}), 400
+    user_msg = data.get("question")
+    if not user_msg:
+        return jsonify({"answer": "Por favor, escribe una pregunta."}), 400
+    if data.get("image"):
+        return jsonify({"answer": "Por ahora solo puedo leer texto."}), 400
+
+    messages = build_messages(user_msg)
+
+    payload = {
+        "model": ZAI_MODEL,
+        "messages": messages,
+        "max_tokens": 1024,
+        "temperature": 0.7,
+        "stream": True
+        # No desactivamos thinking: queremos el reasoning_content para mostrar status
+    }
+
+    def generate():
+        try:
+            with requests.post(
+                "https://api.z.ai/api/paas/v4/chat/completions",
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": f"Bearer {ZAI_API_KEY}",
+                    "Accept-Language": "es-AR,es"
+                },
+                json=payload,
+                stream=True,
+                timeout=60
+            ) as r:
+                if r.status_code != 200:
+                    yield sse_event("error", {"message": f"HTTP {r.status_code}: {r.text[:200]}"})
+                    return
+
+                content_type = r.headers.get('content-type', '')
+
+                # Fallback: si por algún motivo la API no responde con SSE
+                if 'text/event-stream' not in content_type:
+                    try:
+                        data_json = r.json()
+                        content = data_json["choices"][0]["message"]["content"]
+                        yield sse_event("chunk", {"text": content})
+                        yield sse_event("done", {})
+                    except Exception as e:
+                        yield sse_event("error", {"message": f"Parse error: {e}"})
+                    return
+
+                # SSE parsing
+                current_status = None
+                for line in r.iter_lines():
+                    if not line:
+                        continue
+                    line = line.decode('utf-8') if isinstance(line, bytes) else line
+                    if not line.startswith('data: '):
+                        continue
+                    data_str = line[6:].strip()
+                    if data_str == '[DONE]':
+                        break
+                    try:
+                        chunk = json.loads(data_str)
+                        choices = chunk.get("choices", [])
+                        if not choices:
+                            continue
+                        delta = choices[0].get("delta", {})
+
+                        # Procesar reasoning_content → traducir a status en español
+                        rc = delta.get("reasoning_content", "")
+                        if rc:
+                            new_status = detect_status(rc)
+                            if new_status and new_status != current_status:
+                                current_status = new_status
+                                yield sse_event("status", {"text": new_status})
+
+                        # Procesar content → fragmento de respuesta
+                        c = delta.get("content", "")
+                        if c:
+                            yield sse_event("chunk", {"text": c})
+
+                        # Si terminó, cortamos
+                        if choices[0].get("finish_reason") == "stop":
+                            break
+                    except json.JSONDecodeError:
+                        continue
+
+                yield sse_event("done", {})
+        except requests.exceptions.Timeout:
+            yield sse_event("error", {"message": "Timeout: el servidor tardó demasiado."})
+        except Exception as e:
+            yield sse_event("error", {"message": str(e)})
+
+    return Response(
+        generate(),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no',   # desactiva buffering en nginx/proxies
+            'Connection': 'keep-alive'
+        }
+    )
 
 
 if __name__ == '__main__':

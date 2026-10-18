@@ -170,6 +170,100 @@
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
             border: 1px solid rgba(255,255,255,0.1);
         }
+
+        /* --- MENÚ USUARIO EN NAVBAR --- */
+        .navbar-user-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 24px;
+            transition: all 0.2s;
+        }
+        .navbar-user-menu:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: rgba(0, 240, 255, 0.4);
+        }
+        .user-avatar-small {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00f0ff, #ff00ff);
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            font-family: 'Space Grotesk', sans-serif;
+            flex-shrink: 0;
+        }
+        .user-name-small {
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+            white-space: nowrap;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .logout-link {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.6);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .logout-link:hover {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.15);
+        }
+
+        /* --- USER CARD EN SIDEBAR MOBILE --- */
+        .sidebar-user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        .sidebar-user-card .user-avatar-small {
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+        }
+        .sidebar-user-name {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+        .sidebar-user-email {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+
+        /* Responsive: ocultar nombre en mobile muy chico */
+        @media (max-width: 480px) {
+            .user-name-small { display: none; }
+            .navbar-user-menu { padding: 6px; }
+        }
     </style>
 </head>
 
@@ -213,8 +307,10 @@
                     <li><a href="beta-lab.html" class="nav-link">Beta Lab</a></li>
                     <li><a href="forms.html" class="nav-link">Forms</a></li>
                     <hr style="border: 0.5px solid rgba(255,255,255,0.1); width: 100%;">
-                    <li><a href="auth.html" class="nav-link" style="color: #00f0ff;">Iniciar Sesión</a></li>
-                    <li><a href="auth.html" class="nav-link" style="color: #ff00ff;">Registrate</a></li>
+                    <div id="sidebarAuth">
+                        <li><a href="auth.html" class="nav-link" style="color: #00f0ff;">Iniciar Sesión</a></li>
+                        <li><a href="auth.html" class="nav-link" style="color: #ff00ff;">Registrate</a></li>
+                    </div>
                 </ul>
             </div>
 
@@ -491,9 +587,71 @@
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
         }
+
+        // --- MENÚ DE USUARIO DINÁMICO ---
         function updateUserMenu() {
-            console.log("Menú actualizado");
+            const loginButtons = document.getElementById('loginButtons');
+            const sidebarAuth = document.getElementById('sidebarAuth');
+            if (!loginButtons) return;
+
+            if (auth.isLoggedIn()) {
+                const name = auth.getUsername() || 'Usuario';
+                const initial = name.charAt(0).toUpperCase();
+                const email = auth.getCurrentUserEmail() || '';
+
+                // Reemplazar botones de login por info del usuario en el navbar
+                loginButtons.innerHTML = `
+                    <div class="navbar-user-menu">
+                        <div class="user-avatar-small">${initial}</div>
+                        <span class="user-name-small">Hola, ${escapeHtmlText(name)}</span>
+                        <button onclick="logout()" class="logout-link" title="Cerrar sesión">
+                            <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
+                        </button>
+                    </div>
+                `;
+
+                // Actualizar también el sidebar (mobile)
+                if (sidebarAuth) {
+                    sidebarAuth.innerHTML = `
+                        <li>
+                            <div class="sidebar-user-card">
+                                <div class="user-avatar-small">${initial}</div>
+                                <div>
+                                    <div class="sidebar-user-name">${escapeHtmlText(name)}</div>
+                                    <div class="sidebar-user-email">${escapeHtmlText(email)}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li><a href="#" onclick="logout(); return false;" class="nav-link" style="color: #ff6b6b;">Cerrar Sesión</a></li>
+                    `;
+                }
+            } else {
+                // No logueado: dejar los botones originales
+                if (sidebarAuth) {
+                    sidebarAuth.innerHTML = `
+                        <li><a href="auth.html" class="nav-link" style="color: #00f0ff;">Iniciar Sesión</a></li>
+                        <li><a href="auth.html" class="nav-link" style="color: #ff00ff;">Registrate</a></li>
+                    `;
+                }
+            }
         }
+
+        function logout() {
+            if (!confirm('¿Cerrar sesión?')) return;
+            auth.logout();
+            updateUserMenu();
+            // Redirigir al index para limpiar estado
+            window.location.href = 'index.html';
+        }
+
+        function escapeHtmlText(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Ejecutar cuando carga la página
+        document.addEventListener('DOMContentLoaded', updateUserMenu);
     </script>
     
     <script src="js/auth.js"></script>

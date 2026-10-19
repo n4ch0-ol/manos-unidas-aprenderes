@@ -82,6 +82,17 @@
             gap: 12px;
         }
 
+        .brand-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: opacity 0.2s;
+            cursor: pointer;
+        }
+        .brand-link:hover { opacity: 0.85; }
+        .brand-link:hover .brand-text { transform: translateX(2px); }
+
         .brand-logo {
             height: 38px;
             width: 38px;
@@ -288,18 +299,35 @@
         }
 
         .thinking-label {
-            font-size: 13px;
-            color: var(--text-muted);
-            font-style: italic;
-            letter-spacing: 0.4px;
+            font-size: 14px;
+            color: #e2e8f0;
+            font-style: normal;
+            font-weight: 500;
+            letter-spacing: 0.3px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+
+        .thinking-label #thinking-status-text {
+            color: var(--accent);
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
         }
 
         .thinking-label .dots::after {
             content: '';
             animation: dots 1.5s steps(4, end) infinite;
+            color: var(--accent);
+            margin-left: 2px;
+            font-weight: 700;
         }
 
         /* (animación de esfera 3D ahora gestionada por JS + SVG) */
@@ -835,17 +863,128 @@
             }
             .orb { opacity: 0.8; }
         }
+
+        /* --- INTRO ANIMATION (SIVIA se escribe al cargar) --- */
+        .intro-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 28px;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        .intro-overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .intro-logo-img {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            border: 2px solid rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.5);
+            animation: introLogoPulse 1.8s ease-in-out infinite;
+            object-fit: cover;
+        }
+        @keyframes introLogoPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(56, 189, 248, 0.5); }
+            50%      { transform: scale(1.06); box-shadow: 0 0 70px rgba(56, 189, 248, 0.9); }
+        }
+
+        .intro-text-container {
+            font-family: 'Inter', sans-serif;
+            font-size: 52px;
+            font-weight: 700;
+            letter-spacing: 10px;
+            display: flex;
+            align-items: center;
+            min-height: 64px;
+        }
+        .intro-text {
+            background: linear-gradient(90deg, #38bdf8, #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.4));
+        }
+        .intro-cursor {
+            color: var(--accent);
+            font-weight: 300;
+            margin-left: 4px;
+            animation: cursorBlink 0.7s steps(2) infinite;
+        }
+        @keyframes cursorBlink {
+            50% { opacity: 0; }
+        }
+
+        .intro-subtitle {
+            font-size: 13px;
+            color: rgba(148, 163, 184, 0.7);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 400;
+            opacity: 0;
+            animation: introSubtitleFade 0.8s ease 1.2s forwards;
+        }
+        @keyframes introSubtitleFade {
+            to { opacity: 1; }
+        }
+
+        .intro-progress {
+            width: 180px;
+            height: 2px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .intro-progress::after {
+            content: '';
+            display: block;
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            animation: introProgress 2s ease forwards;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+        }
+        @keyframes introProgress {
+            to { width: 100%; }
+        }
+
+        @media (max-width: 640px) {
+            .intro-text-container { font-size: 36px; letter-spacing: 6px; }
+            .intro-logo-img { width: 72px; height: 72px; }
+            .intro-subtitle { font-size: 11px; letter-spacing: 3px; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- INTRO ANIMATION -->
+    <div class="intro-overlay" id="intro-overlay">
+        <img src="images/sivia recuadro derecho.png" alt="SIVIA" class="intro-logo-img" onerror="this.style.display='none'">
+        <div class="intro-text-container">
+            <span class="intro-text" id="intro-text"></span><span class="intro-cursor">|</span>
+        </div>
+        <div class="intro-subtitle">Asistente Inteligente</div>
+        <div class="intro-progress"></div>
+    </div>
 
     <header>
         <div class="brand-area">
             <button class="menu-toggle" onclick="toggleSidebar()" title="Menú">
                 <span class="material-icons-round">menu</span>
             </button>
-            <img src="images/sivia recuadro derecho.png" alt="SIVIA" class="brand-logo" onerror="this.style.display='none'">
-            <span class="brand-text">SIVIA</span>
+            <a href="https://n4ch0-ol.github.io/manos-unidas-aprenderes/" class="brand-link" title="Volver al inicio">
+                <img src="images/sivia recuadro derecho.png" alt="SIVIA" class="brand-logo" onerror="this.style.display='none'">
+                <span class="brand-text">SIVIA</span>
+            </a>
         </div>
         <div class="status-pill">EN LÍNEA</div>
     </header>
@@ -1953,16 +2092,50 @@
             }
         });
 
+        // --- INTRO ANIMATION (SIVIA se escribe al cargar) ---
+        const INTRO_TEXT = 'SIVIA';
+        const INTRO_CHAR_DELAY = 180; // ms entre cada letra
+
+        function playIntro() {
+            const overlay = document.getElementById('intro-overlay');
+            const textEl = document.getElementById('intro-text');
+            if (!overlay || !textEl) return;
+
+            let i = 0;
+            const typeInterval = setInterval(() => {
+                if (i < INTRO_TEXT.length) {
+                    textEl.textContent += INTRO_TEXT[i];
+                    i++;
+                } else {
+                    clearInterval(typeInterval);
+                    // Esperar un poco y ocultar el overlay
+                    setTimeout(() => {
+                        overlay.classList.add('hide');
+                        // Remover del DOM después de la transición
+                        setTimeout(() => {
+                            overlay.style.display = 'none';
+                        }, 600);
+                        // Foco en el input después del intro
+                        const input = document.getElementById('user-input');
+                        if (input) input.focus();
+                    }, 900);
+                }
+            }, INTRO_CHAR_DELAY);
+        }
+
         // --- INICIALIZACIÓN ---
         window.addEventListener('DOMContentLoaded', () => {
+            // Iniciar intro animation primero
+            playIntro();
+
             updateUserCard();
             renderChatList();
             checkAuthRequired();
             // Auto-abrir sidebar en desktop si hay usuario logueado
             if (auth.isLoggedIn() && window.innerWidth > 1024) {
-                setTimeout(() => toggleSidebar(true), 300);
+                setTimeout(() => toggleSidebar(true), 1800); // después del intro
             }
-            document.getElementById('user-input').focus();
+            // El foco del input se da después del intro
         });
 
         // Atajos de teclado

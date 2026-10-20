@@ -585,31 +585,59 @@
             border-bottom: 1px solid var(--border-soft);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .new-chat-btn {
+        .new-chat-btn, .import-chat-btn {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
             padding: 10px 14px;
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(168, 85, 247, 0.18));
-            border: 1px solid rgba(56, 189, 248, 0.3);
             border-radius: 10px;
-            color: var(--accent);
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
             font-family: inherit;
             transition: all 0.2s;
+            min-width: 0;
+        }
+
+        .new-chat-btn {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(168, 85, 247, 0.18));
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent);
         }
         .new-chat-btn:hover {
             background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(168, 85, 247, 0.3));
             transform: translateY(-1px);
         }
         .new-chat-btn .material-icons-round { font-size: 18px; }
+
+        .import-chat-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 12px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 10px;
+            color: #d8b4fe;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.2s;
+            flex: 0 0 auto;
+        }
+        .import-chat-btn:hover {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+        .import-chat-btn .material-icons-round { font-size: 18px; }
 
         .close-sidebar {
             background: transparent;
@@ -837,6 +865,151 @@
         }
         .login-required .login-btn:hover { transform: translateY(-2px); }
 
+        /* --- MODAL DE IMPORTACIÓN --- */
+        .import-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 250;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .import-modal.show { display: flex; }
+        .import-modal-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .import-modal h3 {
+            color: var(--text-main);
+            font-size: 20px;
+            margin-bottom: 6px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .import-modal .subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .import-zone {
+            border: 2px dashed rgba(168, 85, 247, 0.35);
+            border-radius: 12px;
+            padding: 28px 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 14px;
+            transition: all 0.2s;
+            cursor: pointer;
+            background: rgba(168, 85, 247, 0.04);
+        }
+        .import-zone:hover, .import-zone.dragover {
+            border-color: var(--accent-2);
+            background: rgba(168, 85, 247, 0.1);
+            color: white;
+        }
+        .import-zone .material-icons-round {
+            font-size: 36px;
+            color: #d8b4fe;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .import-zone .main-text {
+            color: white;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .import-zone .formats {
+            color: var(--accent);
+            font-size: 11px;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+        .import-status {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            display: none;
+            line-height: 1.4;
+        }
+        .import-status.show { display: block; }
+        .import-status.success {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            color: #4ade80;
+        }
+        .import-status.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+        .import-status.processing {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--accent);
+        }
+        .import-status .spinner-mini {
+            display: inline-block;
+            width: 12px; height: 12px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .import-help {
+            margin-top: 14px;
+            padding: 12px;
+            background: rgba(56, 189, 248, 0.06);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+        .import-help strong { color: var(--accent); }
+        .import-help a {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px dotted;
+        }
+        .import-help a:hover { color: #7dd3fc; }
+
+        .import-close-btn {
+            width: 100%;
+            margin-top: 16px;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .import-close-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -1003,6 +1176,9 @@
                 <span class="material-icons-round">add</span>
                 Nuevo chat
             </button>
+            <button class="import-chat-btn" onclick="openImportModal()" title="Importar chat">
+                <span class="material-icons-round">file_upload</span>
+            </button>
             <button class="close-sidebar" onclick="toggleSidebar()" title="Cerrar">
                 <span class="material-icons-round">close</span>
             </button>
@@ -1036,6 +1212,38 @@
                 <span class="material-icons-round" style="font-size:18px;">login</span>
                 Iniciar sesión
             </a>
+        </div>
+    </div>
+
+    <!-- MODAL DE IMPORTACIÓN -->
+    <div class="import-modal" id="import-modal">
+        <div class="import-modal-card">
+            <h3>
+                <span class="material-icons-round" style="color:#d8b4fe;">file_upload</span>
+                Importar chat
+            </h3>
+            <p class="subtitle">
+                Traé chats de otras IAs (ChatGPT, Gemini, Claude, etc.) a tu historial de SIVIA. Los archivos se procesan 100% en tu navegador, no se suben a ningún servidor.
+            </p>
+
+            <div class="import-zone" id="import-zone" onclick="document.getElementById('import-file-input').click()">
+                <span class="material-icons-round">cloud_upload</span>
+                <div class="main-text">Hacé click o arrastrá un archivo acá</div>
+                <div class="formats">.md  ·  .txt  ·  .json  ·  .zip</div>
+                <input type="file" id="import-file-input" accept=".md,.txt,.json,.zip" style="display:none" multiple>
+            </div>
+
+            <div class="import-status" id="import-status"></div>
+
+            <div class="import-help">
+                <strong>¿Cómo exportar tus chats?</strong><br>
+                • <strong>ChatGPT</strong>: Settings → Data Controls → Export data (te llega un mail con ZIP). También podés exportar un chat individual como Markdown desde el menú del chat.<br>
+                • <strong>Gemini</strong>: Activity → Delete → Export (descarga un JSON).<br>
+                • <strong>Claude</strong>: Aún no tiene export masivo, pero podés copiar el chat manualmente a un .txt.<br>
+                • <strong>Formato universal</strong>: cualquier .md o .txt con <code>Usuario: ...</code> y <code>Asistente: ...</code> funciona.
+            </div>
+
+            <button class="import-close-btn" onclick="closeImportModal()">Cerrar</button>
         </div>
     </div>
 
@@ -2123,6 +2331,399 @@
             }, INTRO_CHAR_DELAY);
         }
 
+        // --- IMPORTACIÓN DE CHATS ---
+        function openImportModal() {
+            document.getElementById('import-modal').classList.add('show');
+            hideImportStatus();
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.remove('show');
+            document.getElementById('import-file-input').value = '';
+            hideImportStatus();
+        }
+
+        function showImportStatus(type, message) {
+            const status = document.getElementById('import-status');
+            status.className = 'import-status show ' + type;
+            if (type === 'processing') {
+                status.innerHTML = '<span class="spinner-mini"></span>' + message;
+            } else {
+                status.textContent = message;
+            }
+        }
+
+        function hideImportStatus() {
+            const status = document.getElementById('import-status');
+            status.className = 'import-status';
+            status.innerHTML = '';
+        }
+
+        // --- PARSERS DE FORMATOS ---
+
+        // Parser de Markdown genérico (ChatGPT, Gemini, Claude, manual)
+        function parseMarkdown(text, filename) {
+            const lines = text.split('\n');
+            const messages = [];
+            let currentRole = null;
+            let currentContent = [];
+
+            // Patrones para detectar roles
+            const userPatterns = [
+                /^\s*\**\s*(?:You|Usuario|User|Tú|Humano|Human|Yo)\s*\**\s*[:：]\s*(.*)$/i,
+                /^\s*##\s+(?:You|Usuario|User|Tú|Humano|Human|Yo)\s*$/i,
+                /^\s*\*\*You\*\*\s*$/i
+            ];
+            const assistantPatterns = [
+                /^\s*\**\s*(?:ChatGPT|GPT|Assistant|Asistente|Gemini|Claude|AI|SIVIA|Bot)\s*\**\s*[:：]\s*(.*)$/i,
+                /^\s*##\s+(?:ChatGPT|GPT|Assistant|Asistente|Gemini|Claude|AI|SIVIA|Bot)\s*$/i,
+                /^\s*\*\*(?:ChatGPT|Assistant|Gemini|Claude)\*\*\s*$/i
+            ];
+
+            function flushCurrent() {
+                if (currentRole && currentContent.length > 0) {
+                    const content = currentContent.join('\n').trim();
+                    if (content) messages.push({ role: currentRole, content, timestamp: Date.now() });
+                }
+                currentContent = [];
+            }
+
+            function matchAny(patterns, line) {
+                for (const p of patterns) {
+                    const m = line.match(p);
+                    if (m) return m;
+                }
+                return null;
+            }
+
+            for (const line of lines) {
+                const userMatch = matchAny(userPatterns, line);
+                const assistantMatch = matchAny(assistantPatterns, line);
+
+                if (userMatch) {
+                    flushCurrent();
+                    currentRole = 'user';
+                    if (userMatch[1] && userMatch[1].trim()) currentContent.push(userMatch[1]);
+                } else if (assistantMatch) {
+                    flushCurrent();
+                    currentRole = 'bot';
+                    if (assistantMatch[1] && assistantMatch[1].trim()) currentContent.push(assistantMatch[1]);
+                } else if (currentRole) {
+                    currentContent.push(line);
+                }
+            }
+            flushCurrent();
+
+            return {
+                title: filename.replace(/\.(md|txt)$/i, ''),
+                messages: messages
+            };
+        }
+
+        // Parser de conversations.json de ChatGPT (export masivo)
+        function parseChatGPTJson(jsonText) {
+            let data;
+            try {
+                data = JSON.parse(jsonText);
+            } catch (e) {
+                throw new Error('JSON inválido: ' + e.message);
+            }
+
+            if (!Array.isArray(data)) {
+                throw new Error('El JSON no tiene formato de export de ChatGPT (se esperaba un array)');
+            }
+
+            const chats = [];
+            for (const conv of data) {
+                if (!conv || typeof conv !== 'object') continue;
+
+                const title = conv.title || 'Chat importado';
+                const messages = [];
+
+                // Estructura típica: conv.mapping es un árbol de mensajes
+                // Recorremos en orden usando la lista plana si existe, si no, BFS por mapping
+                if (conv.mapping && typeof conv.mapping === 'object') {
+                    // Buscar el nodo raíz (parent = null)
+                    let rootNodeId = null;
+                    for (const [nodeId, node] of Object.entries(conv.mapping)) {
+                        if (node && !node.parent) {
+                            rootNodeId = nodeId;
+                            break;
+                        }
+                    }
+
+                    if (rootNodeId) {
+                        // BFS desde la raíz, siguiendo children en orden
+                        const visited = new Set();
+                        function visit(nodeId) {
+                            if (visited.has(nodeId)) return;
+                            visited.add(nodeId);
+                            const node = conv.mapping[nodeId];
+                            if (!node) return;
+
+                            if (node.message && node.message.author && node.message.author.role) {
+                                const role = node.message.author.role;
+                                if (role === 'user' || role === 'assistant') {
+                                    let content = '';
+                                    if (node.message.content && node.message.content.parts) {
+                                        content = node.message.content.parts
+                                            .filter(p => typeof p === 'string')
+                                            .join('\n');
+                                    } else if (typeof node.message.content === 'string') {
+                                        content = node.message.content;
+                                    }
+                                    if (content && content.trim()) {
+                                        messages.push({
+                                            role: role === 'user' ? 'user' : 'bot',
+                                            content: content.trim(),
+                                            timestamp: node.message.create_time
+                                                ? node.message.create_time * 1000
+                                                : Date.now()
+                                        });
+                                    }
+                                }
+                            }
+
+                            if (node.children && Array.isArray(node.children)) {
+                                for (const childId of node.children) {
+                                    visit(childId);
+                                }
+                            }
+                        }
+                        visit(rootNodeId);
+                    }
+                }
+
+                // Fallback: si tiene array directo de mensajes
+                if (messages.length === 0 && Array.isArray(conv.messages)) {
+                    for (const msg of conv.messages) {
+                        if (msg.author === 'user' || msg.author === 'assistant' || msg.role === 'user' || msg.role === 'assistant') {
+                            const role = msg.author || msg.role;
+                            const content = msg.content || msg.text || '';
+                            if (content) {
+                                messages.push({
+                                    role: role === 'user' ? 'user' : 'bot',
+                                    content: typeof content === 'string' ? content : JSON.stringify(content),
+                                    timestamp: msg.create_time ? msg.create_time * 1000 : Date.now()
+                                });
+                            }
+                        }
+                    }
+                }
+
+                if (messages.length > 0) {
+                    chats.push({
+                        title: title,
+                        messages: messages,
+                        createdAt: messages[0]?.timestamp || Date.now(),
+                        updatedAt: messages[messages.length - 1]?.timestamp || Date.now()
+                    });
+                }
+            }
+
+            return chats;
+        }
+
+        // Parser de ZIP (usamos la librería JSZip via CDN dinámica)
+        async function parseZip(file) {
+            // Cargar JSZip dinámicamente si no está
+            if (typeof JSZip === 'undefined') {
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+                    script.onload = resolve;
+                    script.onerror = () => reject(new Error('No se pudo cargar JSZip'));
+                    document.head.appendChild(script);
+                });
+            }
+
+            const zip = await JSZip.loadAsync(file);
+            const chats = [];
+
+            // Buscar conversations.json (formato ChatGPT)
+            const convFile = zip.file('conversations.json');
+            if (convFile) {
+                const jsonText = await convFile.async('text');
+                const parsed = parseChatGPTJson(jsonText);
+                chats.push(...parsed);
+            }
+
+            // Buscar archivos .md o .txt en el ZIP
+            const mdFiles = Object.values(zip.files).filter(f =>
+                /\.(md|txt|json)$/i.test(f.name) && !f.dir
+            );
+
+            for (const f of mdFiles) {
+                if (f.name === 'conversations.json') continue;
+                try {
+                    const text = await f.async('text');
+                    if (f.name.toLowerCase().endsWith('.json')) {
+                        try {
+                            const parsed = parseChatGPTJson(text);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                chats.push(...parsed);
+                                continue;
+                            }
+                        } catch {
+                            // Si falla como JSON, intentar como markdown
+                        }
+                    }
+                    const parsed = parseMarkdown(text, f.name.split('/').pop());
+                    if (parsed.messages.length > 0) {
+                        chats.push({
+                            title: parsed.title,
+                            messages: parsed.messages,
+                            createdAt: Date.now(),
+                            updatedAt: Date.now()
+                        });
+                    }
+                } catch (e) {
+                    console.warn('No se pudo procesar', f.name, e);
+                }
+            }
+
+            return chats;
+        }
+
+        // --- MANEJO DE ARCHIVOS ---
+        async function handleImportFile(file) {
+            if (!file) return;
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            showImportStatus('processing', `Procesando ${file.name}...`);
+
+            try {
+                let chats = [];
+
+                if (ext === 'zip') {
+                    chats = await parseZip(file);
+                } else if (ext === 'json') {
+                    const text = await file.text();
+                    // Intentar como JSON de ChatGPT primero
+                    try {
+                        const parsed = parseChatGPTJson(text);
+                        if (Array.isArray(parsed)) {
+                            chats = parsed;
+                        } else {
+                            chats = [parsed];
+                        }
+                    } catch {
+                        // Si falla como JSON, intentar como markdown (a veces los .json tienen texto plano)
+                        const parsed = parseMarkdown(text, file.name);
+                        if (parsed.messages.length > 0) chats = [parsed];
+                    }
+                } else if (ext === 'md' || ext === 'txt') {
+                    const text = await file.text();
+                    const parsed = parseMarkdown(text, file.name);
+                    if (parsed.messages.length > 0) chats = [parsed];
+                } else {
+                    throw new Error(`Formato no soportado: .${ext}`);
+                }
+
+                if (chats.length === 0) {
+                    showImportStatus('error', 'No se encontraron chats válidos en el archivo. Asegurate de que tenga mensajes con "Usuario:" y "Asistente:" o el formato de export de ChatGPT.');
+                    return;
+                }
+
+                // Guardar cada chat en el historial
+                let imported = 0;
+                let lastChatId = null;
+                for (const chat of chats) {
+                    const newChatObj = {
+                        id: `chat_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+                        title: chat.title || 'Chat importado',
+                        createdAt: chat.createdAt || Date.now(),
+                        updatedAt: chat.updatedAt || Date.now(),
+                        messages: chat.messages
+                    };
+                    const allChats = getAllChats();
+                    allChats.unshift(newChatObj);
+                    saveAllChats(allChats);
+                    imported++;
+                    lastChatId = newChatObj.id;
+                }
+
+                renderChatList();
+
+                const msg = imported === 1
+                    ? `✓ ${imported} chat importado correctamente`
+                    : `✓ ${imported} chats importados correctamente`;
+
+                showImportStatus('success', msg);
+
+                // Abrir el último chat importado después de 1 segundo
+                setTimeout(() => {
+                    if (lastChatId) {
+                        loadChat(lastChatId);
+                        closeImportModal();
+                    }
+                }, 1000);
+
+            } catch (e) {
+                console.error('Error importando:', e);
+                showImportStatus('error', 'Error: ' + e.message);
+            }
+        }
+
+        // --- EVENT LISTENERS DE IMPORTACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('import-file-input');
+            const dropZone = document.getElementById('import-zone');
+
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => {
+                    const files = e.target.files;
+                    if (files && files.length > 0) {
+                        // Procesar múltiples archivos en secuencia
+                        (async () => {
+                            for (const file of files) {
+                                await handleImportFile(file);
+                            }
+                        })();
+                    }
+                });
+            }
+
+            if (dropZone) {
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropZone.classList.add('dragover');
+                    });
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropZone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropZone.classList.remove('dragover');
+                    });
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    const files = e.dataTransfer.files;
+                    if (files && files.length > 0) {
+                        (async () => {
+                            for (const file of files) {
+                                await handleImportFile(file);
+                            }
+                        })();
+                    }
+                });
+            }
+
+            // Cerrar modal con Escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('import-modal');
+                    if (modal.classList.contains('show')) {
+                        closeImportModal();
+                    }
+                }
+            });
+        });
+
         // --- INICIALIZACIÓN ---
         window.addEventListener('DOMContentLoaded', () => {
             // Iniciar intro animation primero
@@ -2158,4 +2759,3 @@
     </script>
 </body>
 </html>
-

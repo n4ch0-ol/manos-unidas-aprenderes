@@ -2367,6 +2367,8 @@
         //   - Sin dos puntos (Gemini): "**user@gmail.com**" / "**Gemini**" seguido de mensaje en la siguiente línea
         //   - Headers markdown: "## You" / "## Assistant"
         //   - Email como identificador de usuario (común en Gemini)
+        //   - Emojis + nombre: "👤 Usuario" / "🤖 Claude" / "🤖 Asistente" (formato copiado/pegado)
+        //   - "Historial de Conversación" + fecha (header de exports copiados)
         function parseMarkdown(text, filename) {
             const lines = text.split('\n');
             const messages = [];
@@ -2374,9 +2376,6 @@
             let currentContent = [];
 
             // Patrones para detectar roles
-            // Format 1: con dos puntos → "Usuario: ..." / "**Usuario**: ..."
-            // Format 2: sin dos puntos → "**Username**" solo en la línea (Gemini style)
-            // Format 3: markdown headers → "## You"
             const userKeywords = 'You|Usuario|User|Tú|Humano|Human|Yo|Me';
             const assistantKeywords = 'ChatGPT|GPT|Assistant|Asistente|Gemini|Claude|AI|SIVIA|Bot|Model';
 
@@ -2388,7 +2387,11 @@
                 // Markdown header: ## You
                 new RegExp('^\\s*##+\\s+(?:' + userKeywords + ')\\s*$', 'i'),
                 // Solo el nombre entre asteriscos sin dos puntos: **You**
-                new RegExp('^\\s*\\*\\*\\s*(?:' + userKeywords + ')\\s*\\*\\*\\s*$', 'i')
+                new RegExp('^\\s*\\*\\*\\s*(?:' + userKeywords + ')\\s*\\*\\*\\s*$', 'i'),
+                // Emoji + nombre: "👤 Usuario" / "👤 You" / "🧑 Usuario" etc.
+                new RegExp('^\\s*[👤🧑🙋🧍👨👩🧑‍💻]+\\s+(?:' + userKeywords + ')\\s*$', 'i'),
+                // Emoji + nombre + dos puntos: "👤 Usuario:"
+                new RegExp('^\\s*[👤🧑🙋🧍👨👩🧑‍💻]+\\s+(?:' + userKeywords + ')\\s*[:：]?\\s*(.*)$', 'i')
             ];
 
             const assistantPatterns = [
@@ -2397,7 +2400,11 @@
                 // Markdown header: ## Gemini
                 new RegExp('^\\s*##+\\s+(?:' + assistantKeywords + ')\\s*$', 'i'),
                 // Solo el nombre entre asteriscos sin dos puntos: **Gemini**
-                new RegExp('^\\s*\\*\\*\\s*(?:' + assistantKeywords + ')\\s*\\*\\*\\s*$', 'i')
+                new RegExp('^\\s*\\*\\*\\s*(?:' + assistantKeywords + ')\\s*\\*\\*\\s*$', 'i'),
+                // Emoji + nombre: "🤖 Claude" / "🤖 Asistente" / "🤖 Gemini" etc.
+                new RegExp('^\\s*[🤖🦾🧠✨🤖]+\\s+(?:' + assistantKeywords + ')\\s*$', 'i'),
+                // Emoji + nombre + dos puntos: "🤖 Claude:"
+                new RegExp('^\\s*[🤖🦾🧠✨🤖]+\\s+(?:' + assistantKeywords + ')\\s*[:：]?\\s*(.*)$', 'i')
             ];
 
             function flushCurrent() {
@@ -2417,7 +2424,7 @@
             }
 
             // Para detectar si una línea ES un header (no contenido)
-            // Tiene que ser corta (<= 60 chars) y matchear exactamente
+            // Tiene que ser corta (<= 80 chars) y matchear exactamente
             function isLikelyHeader(line, patterns) {
                 if (line.length > 80) return null;
                 return matchAny(patterns, line);
@@ -2428,6 +2435,10 @@
                 if (/^\s*[-*]{3,}\s*$/.test(line)) continue;
                 // Skip "Account: ..." line que pone Gemini al inicio
                 if (/^\s*Account:?\s*/i.test(line) && currentRole === null) continue;
+                // Skip "Historial de Conversación" o "Conversation History" (headers de exports copiados)
+                if (/^\s*(Historial de Conversación|Conversation History|Chat History|Historial del chat)\s*$/i.test(line) && currentRole === null) continue;
+                // Skip "Fecha de exportación: ..." (Gemini)
+                if (/^\s*(Fecha de exportación|Export date|Exported on)\s*[:：]/i.test(line) && currentRole === null) continue;
                 // Skip líneas vacías al inicio
                 if (!line.trim() && currentRole === null) continue;
 
